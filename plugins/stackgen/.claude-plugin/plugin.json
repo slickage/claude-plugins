@@ -21,47 +21,5 @@
     "database",
     "monitoring",
     "ai"
-  ],
-  "agents": [
-    "tech-stack-detector",
-    "code-quality-analyzer",
-    "security-analyzer",
-    "performance-analyzer",
-    "architecture-analyzer",
-    "dependency-analyzer",
-    "react-analyzer",
-    "database-analyzer",
-    "testing-analyzer",
-    "e2e-testing-analyzer",
-    "frontend-analyzer",
-    "backend-analyzer",
-    "api-analyzer",
-    "ai-integration-analyzer",
-    "devops-analyzer",
-    "monitoring-analyzer",
-    "i18n-analyzer",
-    "monorepo-analyzer"
-  ],
-  "skills": [
-    {
-      "name": "analyze",
-      "command": "/stackgen:analyze",
-      "description": "Full codebase analysis and skill generation"
-    },
-    {
-      "name": "quick",
-      "command": "/stackgen:quick",
-      "description": "Quick tech stack overview"
-    },
-    {
-      "name": "refresh",
-      "command": "/stackgen:refresh",
-      "description": "Update existing skills"
-    },
-    {
-      "name": "check",
-      "command": "/stackgen:check",
-      "description": "Audit skills for issues"
-    }
   ]
 }
