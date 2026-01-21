@@ -15,19 +15,28 @@ If no skills exist:
 No skills found. Run `/stackgen:analyze` to generate skills.
 ```
 
-## Phase 2: Detect Current Tech Stack
+## Phase 2: Parallel Tech Stack Detection
 
-**Spawn the tech-stack-detector agent** to get the current state of the codebase.
+**Spawn all 4 detector agents in parallel** to get the current state of the codebase:
 
-Use the Task tool:
+| Agent | Purpose |
+|-------|---------|
+| `stackgen:dependency-detector` | Current dependencies and versions |
+| `stackgen:config-detector` | Current configuration and tools |
+| `stackgen:structure-detector` | Current architecture patterns |
+| `stackgen:pattern-detector` | Current coding patterns |
+
+**Task prompts:**
 ```
-subagent_type: stackgen:tech-stack-detector
-prompt: Analyze this codebase and return a complete tech stack report with skills_to_generate list. Focus on identifying any NEW technologies that may have been added recently.
+dependency-detector: Scan dependencies and return current versions. Focus on changes since skills were generated.
+config-detector: Scan configs and identify any new or updated tools.
+structure-detector: Analyze structure for any new patterns or directories.
+pattern-detector: Sample code for any new patterns or libraries in use.
 ```
 
-## Phase 3: Compare and Analyze
+## Phase 3: Merge and Compare
 
-Compare existing skills against the detected tech stack:
+Merge detector results and compare against existing skills:
 
 ### Categories
 
@@ -47,6 +56,14 @@ Compare existing skills against the detected tech stack:
 - Need Updates: X
 - Missing: X
 - Orphaned: X
+
+### Detection Summary
+| Detector | Key Findings |
+|----------|--------------|
+| dependency | React 19.0.0, Next 15.1.0 (updated) |
+| config | New Playwright config detected |
+| structure | New /features directory |
+| pattern | Using Server Actions (new pattern) |
 
 ### Up-to-date Skills
 | Skill | Status |
@@ -78,7 +95,7 @@ Compare existing skills against the detected tech stack:
 2. Run `/stackgen:analyze` to generate missing skills
 
 **Optional:**
-- Remove orphaned skills: `.claude/skills/vue/`
+- Remove orphaned skills manually
 ```
 
 ## Phase 5: Offer Actions

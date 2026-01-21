@@ -6,25 +6,40 @@ description: Full codebase analysis and skill generation
 
 Analyze the current codebase to detect its complete technology stack, then generate tailored Claude Code skills.
 
-## Phase 1: Tech Stack Detection
+## Phase 1: Parallel Tech Stack Detection
 
-**Spawn the tech-stack-detector agent** to identify all technologies in use.
+**Spawn all 4 detector agents in parallel** using multiple Task tool calls in a SINGLE message:
 
-Use the Task tool:
+| Agent | Purpose |
+|-------|---------|
+| `stackgen:dependency-detector` | Scan package.json, requirements.txt, Cargo.toml, etc. |
+| `stackgen:config-detector` | Scan tsconfig, eslint, framework configs, etc. |
+| `stackgen:structure-detector` | Analyze directory structure and organization |
+| `stackgen:pattern-detector` | Sample source files for coding patterns |
+
+Each agent returns JSON with `detected_technologies` and `suggested_skills` arrays.
+
+**Task prompts:**
 ```
-subagent_type: stackgen:tech-stack-detector
-prompt: Analyze this codebase and return a complete tech stack report. Include all frameworks, libraries, tools, and a list of skills_to_generate based on what you find.
+dependency-detector: Scan all dependency manifests and return detected technologies as JSON.
+config-detector: Scan all configuration files and return detected technologies as JSON.
+structure-detector: Analyze directory structure and return detected patterns as JSON.
+pattern-detector: Sample source files and return detected coding patterns as JSON.
 ```
 
-Wait for the tech stack report before proceeding.
+## Phase 2: Merge Detection Results
 
-## Phase 2: Run Analyzers in Parallel
+After all 4 detectors complete, merge their results:
 
-Based on the tech stack detection, spawn ALL relevant analyzer agents **in parallel** using multiple Task tool calls in a single message.
+1. Combine all `detected_technologies` arrays (deduplicate)
+2. Combine all `suggested_skills` arrays (deduplicate)
+3. Create unified tech stack summary
+
+## Phase 3: Run Analyzers in Parallel
+
+Based on merged detection results, spawn ALL relevant analyzer agents **in parallel** using multiple Task tool calls in a SINGLE message.
 
 ### Core Analyzers (Always Run)
-
-Spawn these 5 agents in parallel:
 
 | Agent | Task Prompt |
 |-------|-------------|
@@ -36,33 +51,59 @@ Spawn these 5 agents in parallel:
 
 ### Conditional Analyzers (Based on Detection)
 
-Spawn these agents **only if detected** in the tech stack:
+| Condition | Agent | Skill Generated |
+|-----------|-------|-----------------|
+| React detected | `stackgen:react-analyzer` | .claude/skills/react/SKILL.md |
+| Database/ORM detected | `stackgen:database-analyzer` | .claude/skills/database/SKILL.md |
+| Test framework detected | `stackgen:testing-analyzer` | .claude/skills/testing/SKILL.md |
+| Playwright/Cypress detected | `stackgen:e2e-testing-analyzer` | .claude/skills/e2e-testing/SKILL.md |
+| Frontend framework detected | `stackgen:frontend-analyzer` | .claude/skills/frontend/SKILL.md |
+| Backend patterns detected | `stackgen:backend-analyzer` | .claude/skills/backend/SKILL.md |
+| API routes detected | `stackgen:api-analyzer` | .claude/skills/api/SKILL.md |
+| Docker/CI-CD detected | `stackgen:devops-analyzer` | .claude/skills/devops/SKILL.md |
+| Sentry/logging detected | `stackgen:monitoring-analyzer` | .claude/skills/monitoring/SKILL.md |
+| i18n libraries detected | `stackgen:i18n-analyzer` | .claude/skills/i18n/SKILL.md |
+| Monorepo setup detected | `stackgen:monorepo-analyzer` | .claude/skills/monorepo/SKILL.md |
+| AI SDKs detected | `stackgen:ai-integration-analyzer` | .claude/skills/ai/SKILL.md |
 
-| Condition | Agent | Task Prompt |
-|-----------|-------|-------------|
-| React detected | `stackgen:react-analyzer` | Analyze React patterns and generate .claude/skills/react/SKILL.md |
-| Database/ORM detected | `stackgen:database-analyzer` | Analyze database patterns and generate .claude/skills/database/SKILL.md |
-| Test framework detected | `stackgen:testing-analyzer` | Analyze testing patterns and generate .claude/skills/testing/SKILL.md |
-| Playwright/Cypress detected | `stackgen:e2e-testing-analyzer` | Analyze E2E testing patterns and generate .claude/skills/e2e-testing/SKILL.md |
-| Frontend framework detected | `stackgen:frontend-analyzer` | Analyze frontend patterns and generate .claude/skills/frontend/SKILL.md |
-| Backend patterns detected | `stackgen:backend-analyzer` | Analyze backend patterns and generate .claude/skills/backend/SKILL.md |
-| API routes detected | `stackgen:api-analyzer` | Analyze API patterns and generate .claude/skills/api/SKILL.md |
-| Docker/CI-CD detected | `stackgen:devops-analyzer` | Analyze DevOps patterns and generate .claude/skills/devops/SKILL.md |
-| Sentry/logging detected | `stackgen:monitoring-analyzer` | Analyze monitoring patterns and generate .claude/skills/monitoring/SKILL.md |
-| i18n libraries detected | `stackgen:i18n-analyzer` | Analyze i18n patterns and generate .claude/skills/i18n/SKILL.md |
-| Monorepo setup detected | `stackgen:monorepo-analyzer` | Analyze monorepo patterns and generate .claude/skills/monorepo/SKILL.md |
-| AI SDKs detected | `stackgen:ai-integration-analyzer` | Analyze AI integration patterns and generate .claude/skills/ai/SKILL.md |
+**Launch all applicable analyzers in a SINGLE message** for maximum parallelism.
 
-**Important:** Launch all applicable agents in a SINGLE message with multiple Task tool calls for maximum parallelism.
-
-## Phase 3: Summary
+## Phase 4: Summary
 
 After all agents complete, provide:
 
-1. **Tech Stack Overview** - Summary from tech-stack-detector
+1. **Tech Stack Overview** - Merged summary from all detectors
 2. **Generated Skills** - List all skills created in `.claude/skills/`
 3. **Usage Guide** - How to reference these skills
 4. **Recommendations** - Any issues or suggestions from the analyzers
+
+## Execution Flow
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    PHASE 1 (Parallel)                   │
+├──────────────┬──────────────┬─────────────┬─────────────┤
+│ dependency-  │ config-      │ structure-  │ pattern-    │
+│ detector     │ detector     │ detector    │ detector    │
+└──────┬───────┴──────┬───────┴──────┬──────┴──────┬──────┘
+       │              │              │             │
+       └──────────────┴──────────────┴─────────────┘
+                          │
+                    PHASE 2 (Merge)
+                          │
+       ┌──────────────────┴──────────────────┐
+       │         Unified Tech Stack          │
+       └──────────────────┬──────────────────┘
+                          │
+┌─────────────────────────────────────────────────────────┐
+│                    PHASE 3 (Parallel)                   │
+├─────────┬─────────┬─────────┬─────────┬─────────┬───────┤
+│security │perform- │architec-│ react   │database │ ...   │
+│analyzer │ance     │ture     │analyzer │analyzer │       │
+└─────────┴─────────┴─────────┴─────────┴─────────┴───────┘
+                          │
+                    PHASE 4 (Summary)
+```
 
 ## Output Structure
 
@@ -75,14 +116,5 @@ After all agents complete, provide:
 ├── code-quality/SKILL.md
 ├── react/SKILL.md (if detected)
 ├── database/SKILL.md (if detected)
-├── testing/SKILL.md (if detected)
-├── e2e-testing/SKILL.md (if detected)
-├── frontend/SKILL.md (if detected)
-├── backend/SKILL.md (if detected)
-├── api/SKILL.md (if detected)
-├── devops/SKILL.md (if detected)
-├── monitoring/SKILL.md (if detected)
-├── i18n/SKILL.md (if detected)
-├── monorepo/SKILL.md (if detected)
-└── ai/SKILL.md (if detected)
+└── ... (other conditional skills)
 ```

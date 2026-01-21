@@ -8,50 +8,62 @@ Get an instant overview of the project's technology stack without generating ski
 
 ## Process
 
-**Spawn the tech-stack-detector agent** for a rapid analysis.
+**Spawn all 4 detector agents in parallel** using multiple Task tool calls in a SINGLE message:
 
-Use the Task tool:
+| Agent | Purpose |
+|-------|---------|
+| `stackgen:dependency-detector` | Scan package.json, requirements.txt, etc. |
+| `stackgen:config-detector` | Scan tsconfig, eslint, framework configs |
+| `stackgen:structure-detector` | Analyze directory structure |
+| `stackgen:pattern-detector` | Sample source files for patterns |
+
+**Task prompts:**
 ```
-subagent_type: stackgen:tech-stack-detector
-prompt: Perform a quick analysis of this codebase. Return a concise tech stack summary formatted for display. Do NOT generate any files - just return the analysis.
+dependency-detector: Quick scan of dependency manifests. Return concise JSON summary.
+config-detector: Quick scan of config files. Return concise JSON summary.
+structure-detector: Quick directory structure analysis. Return concise JSON summary.
+pattern-detector: Quick source file sampling. Return concise JSON summary.
 ```
 
-## Expected Output Format
+## Merge and Display
 
-The agent should return a summary like:
+After all 4 detectors complete, merge results and display:
 
 ```
 ## Tech Stack
 
 ### Framework
-- **Runtime:** Node.js 20.x
-- **Framework:** Next.js 15.x (App Router)
-- **Language:** TypeScript 5.x (strict mode)
+- **Runtime:** [from dependency-detector]
+- **Framework:** [from config-detector]
+- **Language:** [from config-detector]
 
 ### Frontend
-- **UI Library:** React 19
-- **Styling:** Tailwind CSS
-- **Components:** shadcn/ui
+- **UI Library:** [from dependency-detector]
+- **Styling:** [from pattern-detector]
+- **Components:** [from structure-detector]
 
 ### Backend
-- **API Style:** Server Actions
-- **Database:** PostgreSQL via Drizzle
-- **Auth:** Clerk
+- **API Style:** [from pattern-detector]
+- **Database:** [from config-detector]
+- **Auth:** [from pattern-detector]
+
+### Architecture
+- **Style:** [from structure-detector]
+- **Organization:** [from structure-detector]
 
 ### Infrastructure
-- **Package Manager:** pnpm
-- **Deployment:** Vercel
-- **CI/CD:** GitHub Actions
+- **Package Manager:** [from dependency-detector]
+- **Deployment:** [from config-detector]
+- **CI/CD:** [from config-detector]
 
 ### Testing
-- **Unit:** Vitest
-- **E2E:** Playwright
+- **Unit:** [from config-detector]
+- **E2E:** [from config-detector]
 
 ### Key Commands
-- `dev` - Start development server
-- `build` - Build for production
-- `test` - Run tests
-- `lint` - Run linter
+- `dev` - [from dependency-detector scripts]
+- `build` - [from dependency-detector scripts]
+- `test` - [from dependency-detector scripts]
 ```
 
 ## After Output

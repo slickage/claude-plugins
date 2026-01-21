@@ -4,10 +4,10 @@ Analyzes codebases and generates tailored Claude Code skills for optimal AI-assi
 
 ## Features
 
-- **Tech Stack Detection** - Automatically identifies frameworks, libraries, and tools
+- **Parallel Detection** - 4 specialized detectors run simultaneously for fast analysis
 - **Pattern Analysis** - Understands your code conventions and architecture
 - **Skill Generation** - Creates project-specific guidance for Claude
-- **18 Specialized Analyzers** - Deep analysis across all aspects of modern development
+- **22 Specialized Agents** - Deep analysis across all aspects of modern development
 
 ## Commands
 
@@ -26,7 +26,7 @@ Analyzes codebases and generates tailored Claude Code skills for optimal AI-assi
 /stackgen:analyze
 ```
 
-Scans your codebase, runs analyzer agents, and generates skills in `.claude/skills/`.
+Spawns parallel detectors, then runs analyzer agents to generate skills in `.claude/skills/`.
 
 ### Quick Reference
 
@@ -50,6 +50,28 @@ Instant tech stack overview without generating files.
 ```
 
 Audit for outdated patterns or missing skills.
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                 DETECTION (Parallel)                    │
+├──────────────┬──────────────┬─────────────┬─────────────┤
+│ dependency-  │ config-      │ structure-  │ pattern-    │
+│ detector     │ detector     │ detector    │ detector    │
+└──────────────┴──────────────┴─────────────┴─────────────┘
+                          │
+                    Merge Results
+                          │
+┌─────────────────────────────────────────────────────────┐
+│                 ANALYSIS (Parallel)                     │
+├─────────┬─────────┬─────────┬─────────┬─────────┬───────┤
+│security │perform- │architec-│ react   │database │ ...   │
+│analyzer │ance     │ture     │analyzer │analyzer │       │
+└─────────┴─────────┴─────────┴─────────┴─────────┴───────┘
+                          │
+                   Generate Skills
+```
 
 ## Generated Skills
 
@@ -80,17 +102,26 @@ Audit for outdated patterns or missing skills.
 | `monorepo` | Turborepo/Nx | monorepo-analyzer |
 | `ai` | AI SDK | ai-integration-analyzer |
 
-## Analyzer Agents (18 Total)
+## Agents (22 Total)
 
-### Core Analyzers
-- `tech-stack-detector` - Identifies all technologies
+### Detection Agents (4)
+Run in parallel for fast tech stack detection:
+- `dependency-detector` - Scans package.json, requirements.txt, Cargo.toml
+- `config-detector` - Scans tsconfig, eslint, framework configs
+- `structure-detector` - Analyzes directory structure and organization
+- `pattern-detector` - Samples source files for coding patterns
+
+### Core Analyzers (6)
+Always run to generate foundational skills:
+- `tech-stack-detector` - Legacy unified detector
 - `security-analyzer` - Security patterns
 - `performance-analyzer` - Performance optimization
 - `architecture-analyzer` - Code structure
 - `dependency-analyzer` - Package management
 - `code-quality-analyzer` - Linting, formatting
 
-### Conditional Analyzers
+### Conditional Analyzers (12)
+Run based on detected technologies:
 - `react-analyzer` - React patterns
 - `database-analyzer` - ORM/database patterns
 - `testing-analyzer` - Unit/integration tests
