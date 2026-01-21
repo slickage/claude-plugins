@@ -1,5 +1,4 @@
 ---
-name: quick
 description: Quick tech stack overview without generating files
 ---
 
@@ -57,9 +56,3 @@ Quickly scan:
 
 If `.claude/skills/` exists, list available skills.
 If not, suggest running `/stackgen:analyze`.
-
-## Guidelines
-
-- Keep output concise and scannable
-- Only show relevant sections
-- Include versions where available

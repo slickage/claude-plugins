@@ -1,5 +1,4 @@
 ---
-name: analyze
 description: Full codebase analysis and skill generation
 ---
 
