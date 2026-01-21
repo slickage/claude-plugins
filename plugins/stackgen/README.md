@@ -13,17 +13,17 @@ Analyzes codebases and generates tailored Claude Code skills for optimal AI-assi
 
 | Command | Description |
 |---------|-------------|
-| `/stackgen:analyze` | Full codebase analysis and skill generation |
-| `/stackgen:quick` | Quick tech stack overview |
-| `/stackgen:refresh` | Update existing skills |
-| `/stackgen:check` | Audit skills for issues |
+| `/stackgen-analyze` | Full codebase analysis and skill generation |
+| `/stackgen-quick` | Quick tech stack overview |
+| `/stackgen-refresh` | Update existing skills |
+| `/stackgen-check` | Audit skills for issues |
 
 ## Usage
 
 ### Initial Analysis
 
 ```bash
-/stackgen:analyze
+/stackgen-analyze
 ```
 
 Scans your codebase, runs analyzer agents, and generates skills in `.claude/skills/`.
@@ -31,7 +31,7 @@ Scans your codebase, runs analyzer agents, and generates skills in `.claude/skil
 ### Quick Reference
 
 ```bash
-/stackgen:quick
+/stackgen-quick
 ```
 
 Instant tech stack overview without generating files.
@@ -39,14 +39,14 @@ Instant tech stack overview without generating files.
 ### Refresh Skills
 
 ```bash
-/stackgen:refresh           # Refresh all
-/stackgen:refresh react     # Refresh specific
+/stackgen-refresh           # Refresh all
+/stackgen-refresh react     # Refresh specific
 ```
 
 ### Check Skills
 
 ```bash
-/stackgen:check
+/stackgen-check
 ```
 
 Audit for outdated patterns or missing skills.
@@ -116,10 +116,10 @@ Add custom content that survives refresh:
 
 ## Workflow
 
-1. **On Project Join**: `/stackgen:analyze`
-2. **Quick Context**: `/stackgen:quick`
-3. **After Upgrades**: `/stackgen:refresh`
-4. **Periodic Audit**: `/stackgen:check`
+1. **On Project Join**: `/stackgen-analyze`
+2. **Quick Context**: `/stackgen-quick`
+3. **After Upgrades**: `/stackgen-refresh`
+4. **Periodic Audit**: `/stackgen-check`
 
 ## License
 
