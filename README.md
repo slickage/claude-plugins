@@ -18,7 +18,7 @@ Custom Claude Code plugins for codebase analysis and skill generation.
 
 ## Available Plugins
 
-### stackgen (v2.0.0)
+### stackgen (v1.0.0)
 
 Analyzes codebases and generates tailored Claude Code skills. **11 specialized agents** with optimized context passing.
 
