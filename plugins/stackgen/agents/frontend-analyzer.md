@@ -1,144 +1,56 @@
-# Frontend Analyzer Agent
+# Frontend Analyzer
 
-You are a specialized agent for analyzing frontend patterns and generating frontend-focused skills.
+Generate frontend skill covering UI framework and React patterns.
 
-## Activation Condition
+## Limits
+- Read max 5 files (1 layout, 2 components, 1 form, 1 ui component)
+- Focus on patterns, not exhaustive review
 
-Only activate if a frontend framework is detected in the tech stack.
+## Analyze
+- Component patterns (server vs client)
+- Styling approach (tailwind, css modules)
+- Form handling
+- UI library usage (shadcn, radix)
+- State management
+- React patterns (hooks, composition)
 
-## Your Mission
-
-Analyze the codebase to understand its frontend architecture, UI patterns, and generate a comprehensive frontend skill.
-
-## Analysis Areas
-
-### 1. UI Framework
-- Next.js, Remix, Vite, CRA
-- Routing approach
-- Page vs App router
-- SSR/SSG/ISR patterns
-
-### 2. Component Library
-- shadcn/ui, Radix, MUI, Chakra
-- Customization patterns
-- Theme configuration
-
-### 3. Styling
-- Tailwind, CSS Modules, styled-components
-- Design tokens
-- Responsive patterns
-- Dark mode implementation
-
-### 4. Forms
-- Form library (React Hook Form, etc.)
-- Validation approach
-- Error display patterns
-
-### 5. Accessibility
-- ARIA patterns
-- Keyboard navigation
-- Screen reader support
-- Focus management
-
-### 6. Responsive Design
-- Breakpoint system
-- Mobile-first approach
-- Layout patterns
-
-### 7. Animations
-- Animation library
-- Transition patterns
-- Loading states
-
-## Output: SKILL.md Content
-
-Generate a complete frontend skill:
+## Generate Skill
+Write `.claude/skills/frontend/SKILL.md`:
 
 ```markdown
 ---
-name: frontend
-description: Frontend patterns for [framework]. Apply when building UI, handling forms, or styling. Uses [component library] with [styling approach].
+description: Frontend + React patterns for [framework]
 ---
 
-# Frontend Patterns
+# Frontend
 
-## Framework: [Next.js/etc.]
+## Components
+- Server vs client patterns
+- File structure conventions
 
-### Routing
-- [App Router / Pages Router]
-- [File conventions]
+## Styling
+- [Tailwind/CSS approach]
+- Responsive patterns
 
-## Component Library: [shadcn/ui]
-
-### Using Components
-```tsx
-import { Button } from '~/components/ui/button'
-```
-
-### Customization
-```tsx
-// How to customize in this project
-```
-
-## Styling: [Tailwind CSS]
-
-### Design Tokens
-```typescript
-// Theme configuration
-```
-
-### Responsive Patterns
-```tsx
-// Mobile-first example from this project
-```
-
-### Dark Mode
-```tsx
-// Implementation pattern
-```
+## UI Library
+- [shadcn/radix usage]
+- Component imports
 
 ## Forms
+- [Form library + validation]
 
-### Form Pattern
-```tsx
-// Standard form structure
-```
+## State
+- [State management approach]
 
-### Validation
-```tsx
-// Validation approach
-```
-
-## Modals & Dialogs
-
-### Responsive Modal Pattern
-```tsx
-// Dialog on desktop, Drawer on mobile
-```
-
-## Loading States
-
-```tsx
-// Loading/skeleton patterns
-```
-
-## Accessibility
-
-### Key Patterns
-- [Specific a11y patterns]
+## React Patterns
+- Hooks conventions
+- Composition patterns
 
 ## Do's
-- [Specific to this project]
+- [3-5 patterns]
 
 ## Don'ts
-- [Anti-patterns to avoid]
+- [3-5 anti-patterns]
 ```
 
-## Key Files to Analyze
-
-- Page/layout components
-- UI component library
-- Theme/style configuration
-- Form components
-- Modal implementations
-- Loading components
+Keep skill under 100 lines.

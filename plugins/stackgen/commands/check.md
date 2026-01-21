@@ -4,105 +4,69 @@ description: Audit skills for outdated or missing patterns
 
 # Check Skills
 
-Audit existing skills to identify outdated patterns, missing skills, or orphaned skills.
+Audit existing skills against current codebase.
 
-## Phase 1: Inventory Existing Skills
+## Phase 1: Inventory
 
-Scan `.claude/skills/` and list all current skills with their metadata.
+List all skills in `.claude/skills/`.
 
-If no skills exist:
+If none exist:
 ```
-No skills found. Run `/stackgen:analyze` to generate skills.
-```
-
-## Phase 2: Parallel Tech Stack Detection
-
-**Spawn all 4 detector agents in parallel** to get the current state of the codebase:
-
-| Agent | Purpose |
-|-------|---------|
-| `stackgen:dependency-detector` | Current dependencies and versions |
-| `stackgen:config-detector` | Current configuration and tools |
-| `stackgen:structure-detector` | Current architecture patterns |
-| `stackgen:pattern-detector` | Current coding patterns |
-
-**Task prompts:**
-```
-dependency-detector: Scan dependencies and return current versions. Focus on changes since skills were generated.
-config-detector: Scan configs and identify any new or updated tools.
-structure-detector: Analyze structure for any new patterns or directories.
-pattern-detector: Sample code for any new patterns or libraries in use.
+No skills found. Run `/stackgen:analyze` first.
 ```
 
-## Phase 3: Merge and Compare
+## Phase 2: Detect Current Stack (Haiku)
 
-Merge detector results and compare against existing skills:
-
-### Categories
-
-1. **Up-to-date Skills** - Skills that match current tech stack
-2. **Outdated Skills** - Skills that may need updating (version changes, deprecated patterns)
-3. **Missing Skills** - Technologies detected but no skill exists
-4. **Orphaned Skills** - Skills for technologies no longer in use
-
-## Phase 4: Generate Report
+**Spawn all 4 detectors using `model: haiku`:**
 
 ```
-## Skill Audit Report
+Task calls (all in ONE message):
+- subagent_type: stackgen:dependency-detector, model: haiku
+- subagent_type: stackgen:config-detector, model: haiku
+- subagent_type: stackgen:structure-detector, model: haiku
+- subagent_type: stackgen:pattern-detector, model: haiku
+```
 
-### Summary
-- Total Skills: X
-- Up-to-date: X
-- Need Updates: X
-- Missing: X
-- Orphaned: X
+## Phase 3: Compare
 
-### Detection Summary
-| Detector | Key Findings |
-|----------|--------------|
-| dependency | React 19.0.0, Next 15.1.0 (updated) |
-| config | New Playwright config detected |
-| structure | New /features directory |
-| pattern | Using Server Actions (new pattern) |
+Match existing skills against detected tech:
 
-### Up-to-date Skills
-| Skill | Status |
-|-------|--------|
-| security | Current |
-| react | Current |
+- **Up-to-date** - Skill matches current stack
+- **Outdated** - Version changes or new patterns
+- **Missing** - Tech detected but no skill
+- **Orphaned** - Skill for removed tech
 
-### Skills Needing Updates
+## Phase 4: Report
+
+```
+## Skill Audit
+
+**Summary:** 8 skills, 2 need updates, 1 missing
+
+### Needs Update
 | Skill | Reason |
 |-------|--------|
-| database | Drizzle updated from 0.29 to 0.35 |
-| testing | New test patterns detected |
+| database | Drizzle 0.29→0.35 |
+| testing | Playwright added |
 
-### Missing Skills
-| Technology | Recommended Skill |
-|------------|-------------------|
-| Playwright | e2e-testing |
+### Missing
+| Tech | Suggested |
+|------|-----------|
 | Sentry | monitoring |
 
-### Orphaned Skills
+### Orphaned
 | Skill | Reason |
 |-------|--------|
-| vue | Vue no longer detected in codebase |
+| (none) | |
 
-### Recommendations
-
-**High Priority:**
-1. Run `/stackgen:refresh database,testing` to update outdated skills
-2. Run `/stackgen:analyze` to generate missing skills
-
-**Optional:**
-- Remove orphaned skills manually
+**Recommended:**
+- `/stackgen:refresh database,testing`
+- `/stackgen:analyze` for missing
 ```
 
 ## Phase 5: Offer Actions
 
-Based on the audit, offer to:
-1. Refresh outdated skills
-2. Generate missing skills
-3. Remove orphaned skills
-
-Ask user which actions to take before proceeding.
+Ask user which to execute:
+1. Refresh outdated
+2. Generate missing
+3. Remove orphaned

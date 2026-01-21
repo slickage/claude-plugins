@@ -1,135 +1,44 @@
-# Monitoring & Observability Analyzer Agent
+# Monitoring Analyzer
 
-## Your Mission
+Generate monitoring skill for error tracking and logging.
 
-Analyze the project's monitoring, logging, error tracking, and analytics setup to generate targeted observability skills that help maintain production reliability.
+## Limits
+- Read max 3 files (sentry config, logger, 1 usage example)
+- Focus on patterns, not exhaustive review
 
-**Activation Condition:** Run when error tracking, logging, or analytics libraries are detected.
+## Analyze
+- Error tracking setup (Sentry, etc.)
+- Logging patterns
+- Analytics if present
 
-## Analysis Areas
-
-### 1. Error Tracking
-- **Error Services**
-  - Sentry integration and configuration
-  - LogRocket, Bugsnag, Rollbar setups
-  - Custom error boundary implementations
-- **Error Handling Patterns**
-  - Global error handlers
-  - Error context enrichment
-  - User feedback collection on errors
-  - Source map configuration
-
-### 2. Logging
-- **Logging Libraries**
-  - Pino, Winston, Bunyan configurations
-  - Log levels and formatting
-  - Structured logging patterns
-- **Log Management**
-  - Log aggregation services (Datadog, Logtail, Papertrail)
-  - Log retention policies
-  - Sensitive data redaction
-
-### 3. Application Performance Monitoring (APM)
-- **APM Tools**
-  - Datadog APM, New Relic, Dynatrace
-  - OpenTelemetry instrumentation
-  - Custom span creation
-- **Performance Metrics**
-  - Response time tracking
-  - Database query monitoring
-  - External service call tracking
-
-### 4. Analytics & Metrics
-- **Product Analytics**
-  - PostHog, Mixpanel, Amplitude integrations
-  - Google Analytics 4 setup
-  - Custom event tracking patterns
-- **Business Metrics**
-  - Conversion tracking
-  - User journey analytics
-  - A/B testing frameworks (Statsig, LaunchDarkly)
-
-### 5. Health Checks & Alerting
-- **Health Endpoints**
-  - Readiness and liveness probes
-  - Dependency health checks
-  - Status page integrations
-- **Alerting**
-  - Alert rule configurations
-  - PagerDuty, Opsgenie integrations
-  - Slack/Discord notifications
-
-### 6. Real User Monitoring (RUM)
-- **Frontend Monitoring**
-  - Web Vitals tracking
-  - User session recording
-  - Performance budgets
-- **Synthetic Monitoring**
-  - Uptime checks
-  - Synthetic transaction monitoring
-
-## Output Format
-
-Generate a `monitoring` skill with:
+## Generate Skill
+Write `.claude/skills/monitoring/SKILL.md`:
 
 ```markdown
 ---
-name: monitoring
-description: Use when implementing logging, error tracking, analytics, or observability
+description: Monitoring with [error tracker] + [logger]
 ---
 
-# Monitoring & Observability Patterns
+# Monitoring
 
 ## Error Tracking
-[Error tracking setup specific to this project]
+- Tool: [sentry/etc]
+- Config: [location]
+- Usage pattern
 
-### Error Reporting Example
-```typescript
-// Project-specific error handling patterns
-```
+## Logging
+- Library: [pino/winston/console]
+- Log levels used
+- Structured logging pattern
 
-## Logging Standards
-[Logging patterns from the codebase]
-
-### Log Format
-```typescript
-// Structured logging examples
-```
-
-## Analytics Integration
-[Analytics patterns used in this project]
-
-## Health Checks
-[Health check implementation patterns]
+## Analytics
+- [If applicable]
 
 ## Do's
-- [Project-specific monitoring best practices]
+- [3-5 patterns]
 
 ## Don'ts
-- [Anti-patterns to avoid]
-
-## Key Files
-- `lib/monitoring/` - Monitoring utilities
-- `instrumentation.ts` - OpenTelemetry setup
+- [3-5 anti-patterns]
 ```
 
-## Key Files to Analyze
-
-- `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`
-- `instrumentation.ts`, `instrumentation.node.ts`
-- `lib/logger.*`, `utils/logger.*`
-- `lib/analytics.*`, `utils/analytics.*`
-- `lib/monitoring/`, `services/monitoring/`
-- `middleware.ts` (for request logging)
-- `app/api/health/route.ts`, `pages/api/health.ts`
-- `next.config.js` (Sentry plugin configuration)
-- `.env*` files (for API keys patterns)
-- `package.json` (monitoring dependencies)
-
-## Analysis Guidelines
-
-1. **Map the observability stack** - Identify all monitoring tools in use
-2. **Document error flow** - How are errors captured, enriched, and reported?
-3. **Understand logging conventions** - Log levels, formats, and when to use each
-4. **Capture analytics patterns** - Event naming conventions, tracking implementations
-5. **Note alerting thresholds** - What triggers alerts and how are they handled?
+Keep skill under 50 lines.

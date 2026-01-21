@@ -4,108 +4,85 @@ description: Full codebase analysis and skill generation
 
 # Analyze and Generate Skills
 
-Analyze the current codebase to detect its complete technology stack, then generate tailored Claude Code skills.
+Analyze the codebase and generate tailored Claude Code skills.
 
-## Phase 1: Parallel Tech Stack Detection
+## Phase 1: Parallel Detection (Use Haiku)
 
-**Spawn all 4 detector agents in parallel** using multiple Task tool calls in a SINGLE message:
+**Spawn all 4 detectors in parallel using `model: haiku`** for fast, cheap detection:
 
-| Agent | Purpose |
-|-------|---------|
-| `stackgen:dependency-detector` | Scan package.json, requirements.txt, Cargo.toml, etc. |
-| `stackgen:config-detector` | Scan tsconfig, eslint, framework configs, etc. |
-| `stackgen:structure-detector` | Analyze directory structure and organization |
-| `stackgen:pattern-detector` | Sample source files for coding patterns |
-
-Each agent returns JSON with `detected_technologies` and `suggested_skills` arrays.
-
-**Task prompts:**
 ```
-dependency-detector: Scan all dependency manifests and return detected technologies as JSON.
-config-detector: Scan all configuration files and return detected technologies as JSON.
-structure-detector: Analyze directory structure and return detected patterns as JSON.
-pattern-detector: Sample source files and return detected coding patterns as JSON.
+Task calls (all in ONE message):
+- subagent_type: stackgen:dependency-detector, model: haiku
+- subagent_type: stackgen:config-detector, model: haiku
+- subagent_type: stackgen:structure-detector, model: haiku
+- subagent_type: stackgen:pattern-detector, model: haiku
 ```
 
-## Phase 2: Merge Detection Results
+Each returns a brief summary with `skills_needed` list.
 
-After all 4 detectors complete, merge their results:
+## Phase 2: Merge Results
 
-1. Combine all `detected_technologies` arrays (deduplicate)
-2. Combine all `suggested_skills` arrays (deduplicate)
-3. Create unified tech stack summary
+Combine detector outputs into unified tech stack:
+- Deduplicate skills_needed lists
+- Create summary for context passing
 
-## Phase 3: Run Analyzers in Parallel
+## Phase 3: Run Analyzers (Pass Context)
 
-Based on merged detection results, spawn ALL relevant analyzer agents **in parallel** using multiple Task tool calls in a SINGLE message.
+**Pass the merged detection context to each analyzer** so they skip re-scanning.
 
-### Core Analyzers (Always Run)
+### Core Analyzers (Always Run - 5 agents)
 
-| Agent | Task Prompt |
-|-------|-------------|
-| `stackgen:security-analyzer` | Analyze security patterns and generate .claude/skills/security/SKILL.md |
-| `stackgen:performance-analyzer` | Analyze performance patterns and generate .claude/skills/performance/SKILL.md |
-| `stackgen:architecture-analyzer` | Analyze architecture patterns and generate .claude/skills/architecture/SKILL.md |
-| `stackgen:dependency-analyzer` | Analyze dependency management and generate .claude/skills/dependency-management/SKILL.md |
-| `stackgen:code-quality-analyzer` | Analyze code quality patterns and generate .claude/skills/code-quality/SKILL.md |
+```
+For each, include in prompt:
+"Tech stack context: {merged_detection_summary}. Generate skill file."
+```
 
-### Conditional Analyzers (Based on Detection)
+| Agent | Output |
+|-------|--------|
+| `stackgen:security-analyzer` | .claude/skills/security/SKILL.md |
+| `stackgen:performance-analyzer` | .claude/skills/performance/SKILL.md |
+| `stackgen:architecture-analyzer` | .claude/skills/architecture/SKILL.md |
+| `stackgen:dependency-analyzer` | .claude/skills/dependency-management/SKILL.md |
+| `stackgen:code-quality-analyzer` | .claude/skills/code-quality/SKILL.md |
 
-| Condition | Agent | Skill Generated |
-|-----------|-------|-----------------|
-| React detected | `stackgen:react-analyzer` | .claude/skills/react/SKILL.md |
-| Database/ORM detected | `stackgen:database-analyzer` | .claude/skills/database/SKILL.md |
-| Test framework detected | `stackgen:testing-analyzer` | .claude/skills/testing/SKILL.md |
-| Playwright/Cypress detected | `stackgen:e2e-testing-analyzer` | .claude/skills/e2e-testing/SKILL.md |
-| Frontend framework detected | `stackgen:frontend-analyzer` | .claude/skills/frontend/SKILL.md |
-| Backend patterns detected | `stackgen:backend-analyzer` | .claude/skills/backend/SKILL.md |
-| API routes detected | `stackgen:api-analyzer` | .claude/skills/api/SKILL.md |
-| Docker/CI-CD detected | `stackgen:devops-analyzer` | .claude/skills/devops/SKILL.md |
-| Sentry/logging detected | `stackgen:monitoring-analyzer` | .claude/skills/monitoring/SKILL.md |
-| i18n libraries detected | `stackgen:i18n-analyzer` | .claude/skills/i18n/SKILL.md |
-| Monorepo setup detected | `stackgen:monorepo-analyzer` | .claude/skills/monorepo/SKILL.md |
-| AI SDKs detected | `stackgen:ai-integration-analyzer` | .claude/skills/ai/SKILL.md |
+### Conditional Analyzers (Only if detected - up to 9 agents)
 
-**Launch all applicable analyzers in a SINGLE message** for maximum parallelism.
+**Skip if fewer than 3 relevant files detected.**
+
+| Condition | Agent | Output |
+|-----------|-------|--------|
+| React/Vue/Svelte | `stackgen:frontend-analyzer` | .claude/skills/frontend/SKILL.md |
+| Server Actions/API | `stackgen:backend-analyzer` | .claude/skills/backend/SKILL.md |
+| Database/ORM | `stackgen:database-analyzer` | .claude/skills/database/SKILL.md |
+| Test framework | `stackgen:testing-analyzer` | .claude/skills/testing/SKILL.md |
+| Docker/CI-CD | `stackgen:devops-analyzer` | .claude/skills/devops/SKILL.md |
+| Sentry/logging | `stackgen:monitoring-analyzer` | .claude/skills/monitoring/SKILL.md |
+| i18n library | `stackgen:i18n-analyzer` | .claude/skills/i18n/SKILL.md |
+| Monorepo tools | `stackgen:monorepo-analyzer` | .claude/skills/monorepo/SKILL.md |
+| AI SDKs | `stackgen:ai-integration-analyzer` | .claude/skills/ai/SKILL.md |
+
+**Launch all applicable analyzers in a SINGLE message.**
 
 ## Phase 4: Summary
 
-After all agents complete, provide:
-
-1. **Tech Stack Overview** - Merged summary from all detectors
-2. **Generated Skills** - List all skills created in `.claude/skills/`
-3. **Usage Guide** - How to reference these skills
-4. **Recommendations** - Any issues or suggestions from the analyzers
+Report:
+1. Tech stack overview
+2. Skills generated (list paths)
+3. Any skipped analyzers and why
 
 ## Execution Flow
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    PHASE 1 (Parallel)                   │
-├──────────────┬──────────────┬─────────────┬─────────────┤
-│ dependency-  │ config-      │ structure-  │ pattern-    │
-│ detector     │ detector     │ detector    │ detector    │
-└──────┬───────┴──────┬───────┴──────┬──────┴──────┬──────┘
-       │              │              │             │
-       └──────────────┴──────────────┴─────────────┘
-                          │
-                    PHASE 2 (Merge)
-                          │
-       ┌──────────────────┴──────────────────┐
-       │         Unified Tech Stack          │
-       └──────────────────┬──────────────────┘
-                          │
-┌─────────────────────────────────────────────────────────┐
-│                    PHASE 3 (Parallel)                   │
-├─────────┬─────────┬─────────┬─────────┬─────────┬───────┤
-│security │perform- │architec-│ react   │database │ ...   │
-│analyzer │ance     │ture     │analyzer │analyzer │       │
-└─────────┴─────────┴─────────┴─────────┴─────────┴───────┘
-                          │
-                    PHASE 4 (Summary)
+PHASE 1: 4 detectors (haiku, parallel) ─────────────┐
+                                                     │
+PHASE 2: Merge into context ─────────────────────────┤
+                                                     │
+PHASE 3: 5-14 analyzers (parallel, with context) ───┤
+                                                     │
+PHASE 4: Summary ────────────────────────────────────┘
 ```
 
-## Output Structure
+## Output
 
 ```
 .claude/skills/
@@ -114,7 +91,5 @@ After all agents complete, provide:
 ├── architecture/SKILL.md
 ├── dependency-management/SKILL.md
 ├── code-quality/SKILL.md
-├── react/SKILL.md (if detected)
-├── database/SKILL.md (if detected)
-└── ... (other conditional skills)
+└── [conditional skills based on detection]
 ```

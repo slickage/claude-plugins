@@ -4,103 +4,83 @@ description: Update existing skills when codebase changes
 
 # Refresh Skills
 
-Regenerate skills when the codebase has evolved or dependencies have been updated.
+Regenerate skills when codebase evolves.
 
 ## Usage
 
 ```
-/stackgen:refresh           # Refresh all skills
-/stackgen:refresh react     # Refresh specific skill
-/stackgen:refresh react,api # Refresh multiple skills
+/stackgen:refresh           # All skills
+/stackgen:refresh react     # Specific skill
+/stackgen:refresh react,api # Multiple skills
 ```
 
-## Phase 1: Validate Existing Skills
+## Phase 1: Validate
 
-First, check if `.claude/skills/` exists. If not:
+Check `.claude/skills/` exists. If not:
 ```
-No existing skills found. Run `/stackgen:analyze` first.
+No skills found. Run `/stackgen:analyze` first.
 ```
 
-List all existing skills in `.claude/skills/`.
+List existing skills.
 
-## Phase 2: Identify Skills to Refresh
+## Phase 2: Preserve Custom Blocks
 
-**If specific skills requested:** Only refresh those skills.
-
-**If refreshing all:** Get the list of existing skill folders.
-
-## Phase 3: Preserve Customizations
-
-Before regenerating, scan each skill file for custom blocks:
-
+Scan skill files for:
 ```markdown
 <!-- CUSTOM: description -->
-[User's custom additions]
+[User content]
 <!-- /CUSTOM -->
 ```
 
-Store these blocks to re-inject after regeneration.
+Store for re-injection.
 
-## Phase 4: Spawn Analyzer Agents
+## Phase 3: Run Detectors (Haiku)
 
-**Spawn the relevant analyzer agents in parallel** based on which skills need refreshing.
+Quick detection for context:
+```
+Task calls (ONE message, model: haiku):
+- stackgen:dependency-detector
+- stackgen:config-detector
+```
 
-Map skills to agents:
+## Phase 4: Spawn Analyzers
+
+Map skills to analyzers:
 
 | Skill | Agent |
 |-------|-------|
-| security | `stackgen:security-analyzer` |
-| performance | `stackgen:performance-analyzer` |
-| architecture | `stackgen:architecture-analyzer` |
-| dependency-management | `stackgen:dependency-analyzer` |
-| code-quality | `stackgen:code-quality-analyzer` |
-| react | `stackgen:react-analyzer` |
-| database | `stackgen:database-analyzer` |
-| testing | `stackgen:testing-analyzer` |
-| e2e-testing | `stackgen:e2e-testing-analyzer` |
-| frontend | `stackgen:frontend-analyzer` |
-| backend | `stackgen:backend-analyzer` |
-| api | `stackgen:api-analyzer` |
-| devops | `stackgen:devops-analyzer` |
-| monitoring | `stackgen:monitoring-analyzer` |
-| i18n | `stackgen:i18n-analyzer` |
-| monorepo | `stackgen:monorepo-analyzer` |
-| ai | `stackgen:ai-integration-analyzer` |
+| security | security-analyzer |
+| performance | performance-analyzer |
+| architecture | architecture-analyzer |
+| dependency-management | dependency-analyzer |
+| code-quality | code-quality-analyzer |
+| frontend | frontend-analyzer |
+| backend | backend-analyzer |
+| database | database-analyzer |
+| testing | testing-analyzer |
+| devops | devops-analyzer |
+| monitoring | monitoring-analyzer |
+| i18n | i18n-analyzer |
+| monorepo | monorepo-analyzer |
+| ai | ai-integration-analyzer |
 
-Use the Task tool for each skill to refresh:
-```
-subagent_type: stackgen:[analyzer-name]
-prompt: Re-analyze the codebase and regenerate .claude/skills/[skill-name]/SKILL.md with updated patterns and best practices.
-```
+**Pass detection context to each analyzer.**
 
-**Launch all applicable agents in a SINGLE message** for maximum parallelism.
+Launch in parallel.
 
-## Phase 5: Re-inject Customizations
+## Phase 5: Re-inject Custom Blocks
 
-After each skill is regenerated, append any preserved custom blocks.
+Append preserved custom blocks to regenerated skills.
 
-## Phase 6: Report Changes
+## Phase 6: Report
 
-For each refreshed skill, report:
-- What changed (new patterns detected, removed patterns, updated versions)
-- Any preserved customizations
-- Recommendations
-
-Example output:
 ```
 ## Refresh Complete
 
-### Updated Skills
+**Updated:** frontend, backend, database
+**Preserved:** 2 custom blocks
 
-| Skill | Changes |
-|-------|---------|
-| react | Added React 19 patterns, updated Server Components guidance |
-| api | Added new endpoint patterns, updated error handling |
-
-### Preserved Customizations
-- react: 1 custom block preserved
-- api: 2 custom blocks preserved
-
-### Recommendations
-- Consider running `/stackgen:check` to verify all skills are current
+**Changes:**
+- frontend: Added React 19 patterns
+- backend: Updated Server Actions patterns
 ```

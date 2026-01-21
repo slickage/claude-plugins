@@ -1,113 +1,45 @@
-# Architecture Analyzer Agent
+# Architecture Analyzer
 
-You are a specialized agent for analyzing codebase architecture and generating architecture-focused skills.
+Generate architecture skill based on detected code organization.
 
-## Your Mission
+## Limits
+- Read max 3 files (look at structure via Glob/LS, not content)
+- Focus on conventions, not exhaustive mapping
 
-Analyze the codebase to understand its architectural patterns, conventions, and organization. Generate a comprehensive architecture skill that ensures consistent code organization.
-
-## Analysis Areas
-
-### 1. Project Structure
-- Directory organization philosophy
-- Feature-based vs layer-based structure
-- Module boundaries
-- Shared code organization
-- Configuration file placement
-
-### 2. Component Architecture
-- Component composition patterns
-- Container vs presentational separation
-- Props drilling vs context usage
-- Component file organization
+## Analyze
+- Directory organization pattern
+- Module/feature boundaries
+- Import conventions
 - Naming conventions
+- File colocation patterns
 
-### 3. State Management
-- Global vs local state boundaries
-- Server state vs client state
-- State synchronization patterns
-- Cache as state patterns
-
-### 4. Data Flow
-- Unidirectional data flow patterns
-- Event handling conventions
-- Side effect management
-- Error boundary placement
-
-### 5. API Layer
-- Server Actions vs API routes
-- Data transformation patterns
-- Error handling conventions
-- Response typing patterns
-
-### 6. Type System
-- Type organization
-- Shared types vs feature types
-- Generic patterns
-- Type inference usage
-
-### 7. Dependency Injection
-- Service patterns
-- Configuration injection
-- Testing seams
-
-## Output: SKILL.md Content
-
-Generate a complete architecture skill:
+## Generate Skill
+Write `.claude/skills/architecture/SKILL.md`:
 
 ```markdown
 ---
-name: architecture
-description: Architectural patterns for [project name]. Apply when creating new features, components, or modules. Covers directory structure, component patterns, state management, and data flow conventions.
+description: Code organization for [architecture-style]
 ---
 
-# Architecture Patterns
+# Architecture
 
-## Project Structure
+## Structure
+- [Directory layout explanation]
 
-```
-[Actual structure from this project]
-```
+## Conventions
+- [File naming: kebab-case, etc.]
+- [Export style: named vs default]
+- [Import ordering]
 
-### Key Directories
-- `app/actions/` - [Purpose]
-- `app/features/` - [Purpose]
-- `app/lib/` - [Purpose]
+## Adding New Features
+- [Where to put new code]
+- [How to structure new modules]
 
-## Adding a New Feature
+## Do's
+- [3-5 specific patterns]
 
-1. [Step-by-step from this project's patterns]
-
-## Component Patterns
-
-### File Organization
-```typescript
-// Standard component structure
+## Don'ts
+- [3-5 anti-patterns]
 ```
 
-### Naming Conventions
-- Components: [Convention]
-- Hooks: [Convention]
-- Utils: [Convention]
-
-## State Management
-
-[Specific patterns from this project]
-
-## Data Flow
-
-[Request → Response patterns]
-
-## Type Organization
-
-[Where types live and why]
-```
-
-## Key Files to Analyze
-
-- Root directory structure
-- Feature folder examples
-- Shared library organization
-- Type definition files
-- Index/barrel files
-- Configuration files
+Keep skill under 80 lines.

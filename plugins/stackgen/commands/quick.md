@@ -4,70 +4,44 @@ description: Quick tech stack overview without generating files
 
 # Quick Tech Stack Overview
 
-Get an instant overview of the project's technology stack without generating skill files.
+Get an instant overview without generating skill files.
 
 ## Process
 
-**Spawn all 4 detector agents in parallel** using multiple Task tool calls in a SINGLE message:
+**Spawn all 4 detectors in parallel using `model: haiku`:**
 
-| Agent | Purpose |
-|-------|---------|
-| `stackgen:dependency-detector` | Scan package.json, requirements.txt, etc. |
-| `stackgen:config-detector` | Scan tsconfig, eslint, framework configs |
-| `stackgen:structure-detector` | Analyze directory structure |
-| `stackgen:pattern-detector` | Sample source files for patterns |
-
-**Task prompts:**
 ```
-dependency-detector: Quick scan of dependency manifests. Return concise JSON summary.
-config-detector: Quick scan of config files. Return concise JSON summary.
-structure-detector: Quick directory structure analysis. Return concise JSON summary.
-pattern-detector: Quick source file sampling. Return concise JSON summary.
+Task calls (all in ONE message):
+- subagent_type: stackgen:dependency-detector, model: haiku
+- subagent_type: stackgen:config-detector, model: haiku
+- subagent_type: stackgen:structure-detector, model: haiku
+- subagent_type: stackgen:pattern-detector, model: haiku
 ```
 
-## Merge and Display
+## Output
 
-After all 4 detectors complete, merge results and display:
+Merge results and display concise summary:
 
 ```
 ## Tech Stack
 
-### Framework
-- **Runtime:** [from dependency-detector]
-- **Framework:** [from config-detector]
-- **Language:** [from config-detector]
+**Framework:** Next.js 15 (App Router) + React 19
+**Language:** TypeScript (strict)
+**Styling:** Tailwind + shadcn/ui
+**Database:** PostgreSQL + Drizzle
+**Auth:** Clerk
+**State:** TanStack Query
+**Testing:** Vitest + Playwright
+**Deploy:** Vercel + GitHub Actions
 
-### Frontend
-- **UI Library:** [from dependency-detector]
-- **Styling:** [from pattern-detector]
-- **Components:** [from structure-detector]
-
-### Backend
-- **API Style:** [from pattern-detector]
-- **Database:** [from config-detector]
-- **Auth:** [from pattern-detector]
-
-### Architecture
-- **Style:** [from structure-detector]
-- **Organization:** [from structure-detector]
-
-### Infrastructure
-- **Package Manager:** [from dependency-detector]
-- **Deployment:** [from config-detector]
-- **CI/CD:** [from config-detector]
-
-### Testing
-- **Unit:** [from config-detector]
-- **E2E:** [from config-detector]
-
-### Key Commands
-- `dev` - [from dependency-detector scripts]
-- `build` - [from dependency-detector scripts]
-- `test` - [from dependency-detector scripts]
+**Commands:**
+- dev: `pnpm dev`
+- build: `pnpm build`
+- test: `pnpm test`
 ```
 
 ## After Output
 
-Check if `.claude/skills/` exists:
-- If skills exist: List them and note they're available
-- If no skills: Suggest running `/stackgen:analyze` for full skill generation
+Check `.claude/skills/`:
+- If exists: List available skills
+- If not: Suggest `/stackgen:analyze`
