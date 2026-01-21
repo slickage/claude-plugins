@@ -1,0 +1,67 @@
+{
+  "name": "stackgen",
+  "version": "2.0.0",
+  "description": "Analyzes codebases to detect tech stacks and generate tailored Claude Code skills. 18 specialized analyzers for React, databases, testing, DevOps, monitoring, AI, and more.",
+  "author": {
+    "name": "crod951",
+    "email": "crod951@gmail.com"
+  },
+  "homepage": "https://github.com/crod951/claude-plugins",
+  "repository": "https://github.com/crod951/claude-plugins",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "analysis",
+    "tech-stack",
+    "react",
+    "nextjs",
+    "typescript",
+    "testing",
+    "devops",
+    "database",
+    "monitoring",
+    "ai"
+  ],
+  "agents": [
+    "tech-stack-detector",
+    "code-quality-analyzer",
+    "security-analyzer",
+    "performance-analyzer",
+    "architecture-analyzer",
+    "dependency-analyzer",
+    "react-analyzer",
+    "database-analyzer",
+    "testing-analyzer",
+    "e2e-testing-analyzer",
+    "frontend-analyzer",
+    "backend-analyzer",
+    "api-analyzer",
+    "ai-integration-analyzer",
+    "devops-analyzer",
+    "monitoring-analyzer",
+    "i18n-analyzer",
+    "monorepo-analyzer"
+  ],
+  "skills": [
+    {
+      "name": "analyze",
+      "command": "/stackgen:analyze",
+      "description": "Full codebase analysis and skill generation"
+    },
+    {
+      "name": "quick",
+      "command": "/stackgen:quick",
+      "description": "Quick tech stack overview"
+    },
+    {
+      "name": "refresh",
+      "command": "/stackgen:refresh",
+      "description": "Update existing skills"
+    },
+    {
+      "name": "check",
+      "command": "/stackgen:check",
+      "description": "Audit skills for issues"
+    }
+  ]
+}

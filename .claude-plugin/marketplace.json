@@ -1,0 +1,23 @@
+{
+  "name": "crod951",
+  "owner": {
+    "name": "crod951",
+    "email": "crod951@gmail.com"
+  },
+  "metadata": {
+    "description": "Custom Claude Code plugins for codebase analysis and skill generation"
+  },
+  "plugins": [
+    {
+      "name": "stackgen",
+      "source": "./plugins/stackgen",
+      "description": "Analyzes codebases and generates tailored Claude Code skills. 18 specialized analyzers for modern full-stack development.",
+      "version": "2.0.0",
+      "author": {
+        "name": "crod951"
+      },
+      "repository": "https://github.com/crod951/claude-plugins",
+      "keywords": ["skills", "analysis", "react", "devops", "testing", "database", "ai"]
+    }
+  ]
+}
