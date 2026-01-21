@@ -20,7 +20,14 @@ Custom Claude Code plugins for codebase analysis and skill generation.
 
 ### stackgen (v2.0.0)
 
-Analyzes codebases and generates tailored Claude Code skills. **18 specialized analyzers** for modern full-stack development.
+Analyzes codebases and generates tailored Claude Code skills. **11 specialized agents** with optimized context passing.
+
+#### Features
+
+- **Fast Detection** - Single stack-detector (Haiku) analyzes dependencies, configs, structure
+- **Context Passing** - Detector findings passed to analyzers to avoid redundant reads
+- **Tech Gating** - Only spawns analyzers for detected technologies
+- **8-File Limits** - Each analyzer reads max 8 files for efficiency
 
 #### Commands
 
@@ -28,44 +35,42 @@ Analyzes codebases and generates tailored Claude Code skills. **18 specialized a
 |---------|-------------|
 | `/stackgen:analyze` | Full codebase analysis and skill generation |
 | `/stackgen:quick` | Quick tech stack overview |
-| `/stackgen:refresh` | Update skills when codebase changes |
+| `/stackgen:refresh` | Update existing skills |
 | `/stackgen:check` | Audit skills for issues |
 
-#### What It Analyzes
+#### Agents
 
-**Core (Always Run):**
-- Security patterns
-- Performance optimization
-- Architecture and structure
-- Code quality
-- Dependencies
+**Detection (1):**
+- `stack-detector` - Comprehensive dependency/config/pattern analysis (Haiku)
 
-**Conditional (Based on Detection):**
-- React/Next.js patterns
-- Database/ORM (Prisma, Drizzle)
-- Testing (Vitest, Jest)
-- E2E (Playwright, Cypress)
-- API (REST, GraphQL, tRPC)
-- DevOps (Docker, CI/CD)
-- Monitoring (Sentry, logging)
-- i18n (internationalization)
-- Monorepo (Turborepo, Nx)
-- AI (LLM APIs, AI SDK)
+**Core Analyzers (4, always run):**
+- `security-analyzer` - Security patterns and best practices
+- `architecture-analyzer` - Code structure and organization
+- `code-quality-analyzer` - Linting, formatting, types, dependencies
+- `performance-analyzer` - Performance optimization
+
+**Conditional Analyzers (6, gated by detection):**
+- `frontend-analyzer` - UI framework patterns (React, Vue, Angular)
+- `backend-analyzer` - Server patterns (APIs, Server Actions)
+- `database-analyzer` - ORM/database patterns
+- `testing-analyzer` - Unit, integration, E2E tests
+- `devops-analyzer` - CI/CD, Docker, deployment
+- `monitoring-analyzer` - Logging, error tracking, analytics
 
 #### Generated Skills
 
 ```
 .claude/skills/
 ├── security/
-├── performance/
 ├── architecture/
 ├── code-quality/
-├── react/          (if detected)
+├── performance/
+├── frontend/       (if detected)
+├── backend/        (if detected)
 ├── database/       (if detected)
 ├── testing/        (if detected)
 ├── devops/         (if detected)
-├── monitoring/     (if detected)
-└── ...
+└── monitoring/     (if detected)
 ```
 
 ## Workflow
