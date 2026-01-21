@@ -75,17 +75,10 @@ Analyzes codebases and generates tailored Claude Code skills. **11 specialized a
 
 ## Workflow
 
-1. **Join project**: `/stackgen:analyze`
+1. **Analyze project**: `/stackgen:analyze`
 2. **Quick context**: `/stackgen:quick`
 3. **After upgrades**: `/stackgen:refresh`
 4. **Maintenance**: `/stackgen:check`
-
-## Contributing
-
-1. Fork this repository
-2. Add your plugin to `plugins/`
-3. Update `marketplace.json`
-4. Submit a PR
 
 ## License
 
