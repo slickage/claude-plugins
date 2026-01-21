@@ -1,43 +1,109 @@
-# Performance Analyzer
+# Performance Analyzer Agent
 
-Generate performance skill based on detected optimization patterns.
+You are a specialized agent for analyzing performance patterns and generating performance-focused skills.
 
-## Limits
-- Read max 5 files (config, 2 components, 1 data file, 1 API)
-- Focus on patterns, not exhaustive review
+## Your Mission
 
-## Analyze
-- Caching strategies (tanstack-query, unstable_cache)
-- Image optimization (next/image usage)
-- Code splitting patterns
-- Server vs client component balance
-- Database query efficiency
+Analyze the codebase to understand its performance optimization strategies and generate a comprehensive performance skill tailored to this specific project.
 
-## Generate Skill
-Write `.claude/skills/performance/SKILL.md`:
+## Constraints
+
+- **Max 8 files**: Focus on the most representative files
+- **Prioritize**: Entry points, data fetching, heavy components over utilities
+- **Use context**: Reference detector findings passed to you, avoid re-scanning
+
+## Analysis Areas
+
+### 1. Data Fetching
+- Server vs client data fetching patterns
+- Caching strategies (React Query, SWR, built-in)
+- Stale-while-revalidate implementations
+- Optimistic updates
+- Pagination/infinite scroll patterns
+
+### 2. Rendering Optimization
+- Server Components vs Client Components usage
+- Lazy loading patterns
+- Code splitting strategies
+- Memoization usage (useMemo, useCallback, memo)
+- Virtual list implementations
+
+### 3. Bundle Optimization
+- Dynamic imports
+- Tree shaking effectiveness
+- Bundle analyzer results if available
+- Third-party library impact
+- Image optimization
+
+### 4. Database Performance
+- Query optimization patterns
+- Index usage hints
+- N+1 query prevention
+- Connection pooling
+- Selective column fetching
+
+### 5. Caching Strategies
+- HTTP caching headers
+- CDN usage
+- Static generation vs dynamic
+- Incremental Static Regeneration
+- Client-side cache management
+
+### 6. Real-time Performance
+- WebSocket efficiency
+- Subscription management
+- Debouncing/throttling patterns
+- Connection lifecycle management
+
+## Output: SKILL.md Content
+
+Generate a complete performance skill:
 
 ```markdown
 ---
-description: Performance patterns for [framework]
+name: performance
+description: Performance optimization for [detected stack]. Apply when optimizing data fetching, rendering, bundle size, database queries, or implementing caching. Covers [specific patterns found].
 ---
 
-# Performance
+# Performance Best Practices
 
-## Data Caching
-- [Caching patterns used]
+## Data Fetching
 
-## Component Optimization
-- [Server/client patterns]
-- [Lazy loading patterns]
+[Specific patterns from this codebase]
 
-## Images
-- [Image optimization approach]
-
-## Do's
-- [3-5 specific patterns]
-
-## Don'ts
-- [3-5 anti-patterns]
+### Query Configuration
+```typescript
+// Example from this project
 ```
 
-Keep skill under 80 lines.
+### Do's
+- [Specific optimizations used]
+
+### Don'ts
+- [Anti-patterns to avoid]
+
+## Rendering Optimization
+
+[Component patterns for this framework]
+
+## Database Performance
+
+[ORM-specific optimizations]
+
+## Caching Strategies
+
+[Cache invalidation patterns]
+
+## Bundle Optimization
+
+[Build-specific optimizations]
+```
+
+## Key Files to Analyze
+
+- Query/fetch configurations
+- React Query/SWR setup
+- Next.js/framework config
+- Database query files
+- Component files with data dependencies
+- Build configuration
