@@ -4,74 +4,65 @@ description: Full codebase analysis and skill generation
 
 # Analyze and Generate Skills
 
-Analyze the current codebase to detect its complete technology stack, then generate tailored Claude Code skills that provide project-specific guidance.
+Analyze the current codebase to detect its complete technology stack, then generate tailored Claude Code skills.
 
-## Process
+## Phase 1: Tech Stack Detection
 
-### Step 1: Tech Stack Detection
+**Spawn the tech-stack-detector agent** to identify all technologies in use.
 
-Analyze the codebase to identify all technologies:
+Use the Task tool:
+```
+subagent_type: stackgen:tech-stack-detector
+prompt: Analyze this codebase and return a complete tech stack report. Include all frameworks, libraries, tools, and a list of skills_to_generate based on what you find.
+```
 
-1. **Read dependency files** (package.json, requirements.txt, etc.)
-   - Extract all dependencies with versions
-   - Note dev vs production dependencies
-   - Identify package manager (npm, pnpm, yarn)
+Wait for the tech stack report before proceeding.
 
-2. **Analyze configuration files**
-   - tsconfig.json - TypeScript settings
-   - eslint.config.js - Linting rules
-   - Framework configs (next.config.ts, vite.config.ts)
-   - ORM configs (drizzle.config.ts, prisma schema)
-   - Test configs (vitest.config.ts)
+## Phase 2: Run Analyzers in Parallel
 
-3. **Examine project structure**
-   - Directory organization patterns
-   - Feature vs layer-based architecture
-   - Component organization
+Based on the tech stack detection, spawn ALL relevant analyzer agents **in parallel** using multiple Task tool calls in a single message.
 
-4. **Sample code patterns**
-   - State management approach
-   - Styling methodology
-   - API patterns
-   - Auth implementation
+### Core Analyzers (Always Run)
 
-### Step 2: Determine Skills to Generate
+Spawn these 5 agents in parallel:
 
-**Always Generate (Core):**
-- `security` - Security best practices
-- `performance` - Performance optimization
-- `architecture` - Code structure and conventions
-- `dependency-management` - Package management
-- `code-quality` - Linting, typing, formatting
+| Agent | Task Prompt |
+|-------|-------------|
+| `stackgen:security-analyzer` | Analyze security patterns and generate .claude/skills/security/SKILL.md |
+| `stackgen:performance-analyzer` | Analyze performance patterns and generate .claude/skills/performance/SKILL.md |
+| `stackgen:architecture-analyzer` | Analyze architecture patterns and generate .claude/skills/architecture/SKILL.md |
+| `stackgen:dependency-analyzer` | Analyze dependency management and generate .claude/skills/dependency-management/SKILL.md |
+| `stackgen:code-quality-analyzer` | Analyze code quality patterns and generate .claude/skills/code-quality/SKILL.md |
 
-**Conditionally Generate:**
-- `react` - If React detected
-- `database` - If database/ORM detected
-- `testing` - If test framework detected
-- `e2e-testing` - If Playwright/Cypress detected
-- `api` - If API routes detected
-- `devops` - If Docker/CI-CD detected
-- `monitoring` - If Sentry/logging detected
-- `i18n` - If i18n libraries detected
-- `monorepo` - If Turborepo/Nx detected
-- `ai` - If AI SDKs detected
+### Conditional Analyzers (Based on Detection)
 
-### Step 3: Generate Skills
+Spawn these agents **only if detected** in the tech stack:
 
-For each skill, create `.claude/skills/[skill-name]/SKILL.md` with:
-- YAML frontmatter (name, description)
-- Project-specific instructions
-- Code examples from the actual codebase
-- Do's and Don'ts
-- Key file references
+| Condition | Agent | Task Prompt |
+|-----------|-------|-------------|
+| React detected | `stackgen:react-analyzer` | Analyze React patterns and generate .claude/skills/react/SKILL.md |
+| Database/ORM detected | `stackgen:database-analyzer` | Analyze database patterns and generate .claude/skills/database/SKILL.md |
+| Test framework detected | `stackgen:testing-analyzer` | Analyze testing patterns and generate .claude/skills/testing/SKILL.md |
+| Playwright/Cypress detected | `stackgen:e2e-testing-analyzer` | Analyze E2E testing patterns and generate .claude/skills/e2e-testing/SKILL.md |
+| Frontend framework detected | `stackgen:frontend-analyzer` | Analyze frontend patterns and generate .claude/skills/frontend/SKILL.md |
+| Backend patterns detected | `stackgen:backend-analyzer` | Analyze backend patterns and generate .claude/skills/backend/SKILL.md |
+| API routes detected | `stackgen:api-analyzer` | Analyze API patterns and generate .claude/skills/api/SKILL.md |
+| Docker/CI-CD detected | `stackgen:devops-analyzer` | Analyze DevOps patterns and generate .claude/skills/devops/SKILL.md |
+| Sentry/logging detected | `stackgen:monitoring-analyzer` | Analyze monitoring patterns and generate .claude/skills/monitoring/SKILL.md |
+| i18n libraries detected | `stackgen:i18n-analyzer` | Analyze i18n patterns and generate .claude/skills/i18n/SKILL.md |
+| Monorepo setup detected | `stackgen:monorepo-analyzer` | Analyze monorepo patterns and generate .claude/skills/monorepo/SKILL.md |
+| AI SDKs detected | `stackgen:ai-integration-analyzer` | Analyze AI integration patterns and generate .claude/skills/ai/SKILL.md |
 
-### Step 4: Summary
+**Important:** Launch all applicable agents in a SINGLE message with multiple Task tool calls for maximum parallelism.
 
-Provide:
-- Complete tech stack inventory
-- List of generated skills
-- How to use each skill
-- Customization suggestions
+## Phase 3: Summary
+
+After all agents complete, provide:
+
+1. **Tech Stack Overview** - Summary from tech-stack-detector
+2. **Generated Skills** - List all skills created in `.claude/skills/`
+3. **Usage Guide** - How to reference these skills
+4. **Recommendations** - Any issues or suggestions from the analyzers
 
 ## Output Structure
 
@@ -80,8 +71,18 @@ Provide:
 ├── security/SKILL.md
 ├── performance/SKILL.md
 ├── architecture/SKILL.md
+├── dependency-management/SKILL.md
 ├── code-quality/SKILL.md
 ├── react/SKILL.md (if detected)
 ├── database/SKILL.md (if detected)
-└── ...
+├── testing/SKILL.md (if detected)
+├── e2e-testing/SKILL.md (if detected)
+├── frontend/SKILL.md (if detected)
+├── backend/SKILL.md (if detected)
+├── api/SKILL.md (if detected)
+├── devops/SKILL.md (if detected)
+├── monitoring/SKILL.md (if detected)
+├── i18n/SKILL.md (if detected)
+├── monorepo/SKILL.md (if detected)
+└── ai/SKILL.md (if detected)
 ```

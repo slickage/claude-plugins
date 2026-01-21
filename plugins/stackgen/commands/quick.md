@@ -2,57 +2,60 @@
 description: Quick tech stack overview without generating files
 ---
 
-# Quick Reference
+# Quick Tech Stack Overview
 
-Provide an instant overview of the project's technology stack without generating skill files.
+Get an instant overview of the project's technology stack without generating skill files.
 
 ## Process
 
-### Step 1: Scan Core Files
+**Spawn the tech-stack-detector agent** for a rapid analysis.
 
-Quickly scan:
-- `package.json` - Dependencies and scripts
-- `tsconfig.json` - TypeScript configuration
-- `next.config.*` / `vite.config.*` - Framework config
-- `.env.example` - Environment variables
-- `docker-compose.yml` / `Dockerfile` - Infrastructure
+Use the Task tool:
+```
+subagent_type: stackgen:tech-stack-detector
+prompt: Perform a quick analysis of this codebase. Return a concise tech stack summary formatted for display. Do NOT generate any files - just return the analysis.
+```
 
-### Step 2: Output Summary
+## Expected Output Format
+
+The agent should return a summary like:
 
 ```
 ## Tech Stack
 
 ### Framework
-- **Runtime:** [Node.js version]
-- **Framework:** [Next.js / Remix / Vite] [version]
-- **Language:** TypeScript [version]
+- **Runtime:** Node.js 20.x
+- **Framework:** Next.js 15.x (App Router)
+- **Language:** TypeScript 5.x (strict mode)
 
 ### Frontend
-- **UI Library:** [React / Vue / Svelte]
-- **Styling:** [Tailwind / styled-components]
-- **Components:** [shadcn/ui / Radix / MUI]
+- **UI Library:** React 19
+- **Styling:** Tailwind CSS
+- **Components:** shadcn/ui
 
 ### Backend
-- **API Style:** [Server Actions / API Routes / tRPC]
-- **Database:** [PostgreSQL / MySQL] via [Prisma / Drizzle]
-- **Auth:** [Clerk / NextAuth / Auth0]
+- **API Style:** Server Actions
+- **Database:** PostgreSQL via Drizzle
+- **Auth:** Clerk
 
 ### Infrastructure
-- **Package Manager:** [pnpm / npm / yarn]
-- **Deployment:** [Vercel / AWS / Docker]
-- **CI/CD:** [GitHub Actions / GitLab CI]
+- **Package Manager:** pnpm
+- **Deployment:** Vercel
+- **CI/CD:** GitHub Actions
 
 ### Testing
-- **Unit:** [Vitest / Jest]
-- **E2E:** [Playwright / Cypress]
+- **Unit:** Vitest
+- **E2E:** Playwright
 
 ### Key Commands
-- `dev` - Start development
+- `dev` - Start development server
 - `build` - Build for production
 - `test` - Run tests
+- `lint` - Run linter
 ```
 
-### Step 3: Note Existing Skills
+## After Output
 
-If `.claude/skills/` exists, list available skills.
-If not, suggest running `/stackgen:analyze`.
+Check if `.claude/skills/` exists:
+- If skills exist: List them and note they're available
+- If no skills: Suggest running `/stackgen:analyze` for full skill generation
