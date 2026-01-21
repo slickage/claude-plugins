@@ -29,16 +29,13 @@ Based on `suggested_analyzers` from the detector, spawn **ONLY the relevant anal
 
 | Condition | Spawn Analyzer |
 |-----------|----------------|
-| Always | `security-analyzer`, `architecture-analyzer`, `code-quality-analyzer`, `dependency-analyzer`, `performance-analyzer` |
+| Always | `security-analyzer`, `architecture-analyzer`, `code-quality-analyzer`, `performance-analyzer` |
 | React/Vue/Angular detected | `frontend-analyzer` |
 | Server Actions/Express/API routes | `backend-analyzer` |
 | PostgreSQL/MongoDB/Prisma/Drizzle | `database-analyzer` |
-| Vitest/Jest detected | `testing-analyzer` |
+| Vitest/Jest/Playwright detected | `testing-analyzer` |
 | Docker/GitHub Actions/Vercel | `devops-analyzer` |
 | Sentry/logging libs detected | `monitoring-analyzer` |
-| i18n libraries detected | `i18n-analyzer` |
-| Turborepo/Nx/workspaces | `monorepo-analyzer` |
-| AI SDK/OpenAI/Anthropic | `ai-integration-analyzer` |
 
 ### Context Passing
 
@@ -96,7 +93,6 @@ After all agents complete, provide:
 - `stackgen:security-analyzer` → .claude/skills/security/SKILL.md
 - `stackgen:architecture-analyzer` → .claude/skills/architecture/SKILL.md
 - `stackgen:code-quality-analyzer` → .claude/skills/code-quality/SKILL.md
-- `stackgen:dependency-analyzer` → .claude/skills/dependency-management/SKILL.md
 - `stackgen:performance-analyzer` → .claude/skills/performance/SKILL.md
 
 ### Conditional Analyzers
@@ -106,9 +102,6 @@ After all agents complete, provide:
 - `stackgen:testing-analyzer` → .claude/skills/testing/SKILL.md
 - `stackgen:devops-analyzer` → .claude/skills/devops/SKILL.md
 - `stackgen:monitoring-analyzer` → .claude/skills/monitoring/SKILL.md
-- `stackgen:i18n-analyzer` → .claude/skills/i18n/SKILL.md
-- `stackgen:monorepo-analyzer` → .claude/skills/monorepo/SKILL.md
-- `stackgen:ai-integration-analyzer` → .claude/skills/ai/SKILL.md
 
 ## Output Structure
 
@@ -117,10 +110,11 @@ After all agents complete, provide:
 ├── security/SKILL.md
 ├── architecture/SKILL.md
 ├── code-quality/SKILL.md
-├── dependency-management/SKILL.md
 ├── performance/SKILL.md
 ├── frontend/SKILL.md (if detected)
 ├── backend/SKILL.md (if detected)
 ├── database/SKILL.md (if detected)
-└── ... (other conditional skills)
+├── testing/SKILL.md (if detected)
+├── devops/SKILL.md (if detected)
+└── monitoring/SKILL.md (if detected)
 ```

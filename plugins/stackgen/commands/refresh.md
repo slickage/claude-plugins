@@ -62,7 +62,6 @@ Map skills to agents:
 | security | `stackgen:security-analyzer` |
 | performance | `stackgen:performance-analyzer` |
 | architecture | `stackgen:architecture-analyzer` |
-| dependency-management | `stackgen:dependency-analyzer` |
 | code-quality | `stackgen:code-quality-analyzer` |
 | frontend | `stackgen:frontend-analyzer` |
 | backend | `stackgen:backend-analyzer` |
@@ -70,9 +69,6 @@ Map skills to agents:
 | testing | `stackgen:testing-analyzer` |
 | devops | `stackgen:devops-analyzer` |
 | monitoring | `stackgen:monitoring-analyzer` |
-| i18n | `stackgen:i18n-analyzer` |
-| monorepo | `stackgen:monorepo-analyzer` |
-| ai | `stackgen:ai-integration-analyzer` |
 
 Pass context to each analyzer:
 

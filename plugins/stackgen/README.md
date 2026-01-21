@@ -8,7 +8,7 @@ Analyzes codebases and generates tailored Claude Code skills for optimal AI-assi
 - **Context Passing** - Detector findings are passed to analyzers to avoid redundant file reads
 - **Tech Detection Gating** - Only spawns analyzers for detected technologies
 - **8-File Limits** - Each analyzer reads max 8 files for efficient analysis
-- **15 Specialized Agents** - Deep analysis across all aspects of modern development
+- **11 Specialized Agents** - Focused analysis across essential development areas
 
 ## Commands
 
@@ -82,10 +82,9 @@ Audit for outdated patterns or missing skills.
 | Skill | Analyzer |
 |-------|----------|
 | `security` | security-analyzer |
-| `performance` | performance-analyzer |
 | `architecture` | architecture-analyzer |
-| `dependency-management` | dependency-analyzer |
-| `code-quality` | code-quality-analyzer |
+| `code-quality` | code-quality-analyzer (includes dependency management) |
+| `performance` | performance-analyzer |
 
 ### Conditional (Based on Detection)
 
@@ -97,25 +96,21 @@ Audit for outdated patterns or missing skills.
 | `testing` | Vitest/Jest/Playwright | testing-analyzer |
 | `devops` | Docker/CI-CD | devops-analyzer |
 | `monitoring` | Sentry/logging | monitoring-analyzer |
-| `i18n` | i18n library | i18n-analyzer |
-| `monorepo` | Turborepo/Nx | monorepo-analyzer |
-| `ai` | AI SDK/OpenAI | ai-integration-analyzer |
 
-## Agents (15 Total)
+## Agents (11 Total)
 
 ### Detection Agent (1)
 
 Runs with Haiku model for fast detection:
 - `stack-detector` - Comprehensive analysis of dependencies, configs, structure, and patterns
 
-### Analyzers (14)
+### Analyzers (10)
 
 **Core Analyzers (Always Run):**
 - `security-analyzer` - Security patterns and best practices
-- `performance-analyzer` - Performance optimization
 - `architecture-analyzer` - Code structure and organization
-- `dependency-analyzer` - Package management
-- `code-quality-analyzer` - Linting, formatting, type safety
+- `code-quality-analyzer` - Linting, formatting, types, dependency management
+- `performance-analyzer` - Performance optimization
 
 **Conditional Analyzers (Gated by Detection):**
 - `frontend-analyzer` - UI framework patterns (React, Vue, Angular)
@@ -124,9 +119,6 @@ Runs with Haiku model for fast detection:
 - `testing-analyzer` - Unit, integration, and E2E tests
 - `devops-analyzer` - CI/CD, Docker, deployment
 - `monitoring-analyzer` - Logging, error tracking, analytics
-- `i18n-analyzer` - Internationalization
-- `monorepo-analyzer` - Workspace patterns
-- `ai-integration-analyzer` - LLM/AI SDK patterns
 
 ## Optimizations
 
@@ -152,7 +144,7 @@ Each analyzer reads a maximum of 8 files, focusing on:
 Analyzers only spawn if their relevant technology is detected:
 - No `database-analyzer` without a database/ORM
 - No `frontend-analyzer` without a UI framework
-- No `monorepo-analyzer` without workspace tooling
+- No `testing-analyzer` without test frameworks
 
 ## Customization
 
