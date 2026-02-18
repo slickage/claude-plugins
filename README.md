@@ -81,7 +81,15 @@ Automates the full lifecycle of working on Linear issues — from planning throu
 
 #### Prerequisites
 
-- Linear MCP plugin, Beads CLI (`bd`), GitHub CLI (`gh`)
+- [Linear MCP plugin](https://github.com/anthropics/claude-code-plugins) installed and configured
+- [Beads CLI](https://github.com/steveyegge/beads) installed (`bd` command available)
+- [GitHub CLI](https://cli.github.com/) installed and authenticated (`gh` command available)
+
+#### Install
+
+```bash
+/plugin install issue-lifecycle@crod951
+```
 
 #### Commands
 
@@ -92,11 +100,36 @@ Automates the full lifecycle of working on Linear issues — from planning throu
 | `/commit` | Semantic commit + close Beads task |
 | `/issue-finish [ID]` | Push, create PR, update Linear, post completion comment |
 
+#### Features
+
+- **Plan-first workflow** — researches your codebase and writes a plan document before any code changes
+- **Review checkpoints** — pauses for your approval after planning and after each task implementation
+- **Branch naming** — auto-generates semantic branches from Linear labels (`feat/`, `fix/`, `chore/`, `docs/`)
+- **Conventional Commits** — auto-detects commit type and formats as `type(ISSUE-ID): description`
+- **Safety rails** — warns on uncommitted changes, incomplete tasks, and issue ID mismatches
+- **Linear integration** — updates status to In Progress / In Review and posts completion comments
+
 #### Workflow
 
 ```
-/issue-start ONC-5 → /issue-task → /commit → /issue-finish
+/issue-start ONC-5       # Fetch issue → research → plan → review → branch
+    ↓
+/issue-task               # Claim next task → implement → present for review
+    ↓
+/commit                   # Stage → commit → close Beads task
+    ↓
+  (repeat /issue-task + /commit for each task)
+    ↓
+/issue-finish             # Pre-flight checks → push → PR → update Linear
 ```
+
+#### Linear Status Lifecycle
+
+```
+Todo → In Progress (/issue-start) → In Review (/issue-finish) → Done (PR merge)
+```
+
+See the [full step-by-step guide](./plugins/issue-lifecycle/README.md) for a detailed walkthrough.
 
 ---
 
