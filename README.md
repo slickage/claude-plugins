@@ -1,6 +1,6 @@
 # claude-plugins
 
-Custom Claude Code plugins for codebase analysis and skill generation.
+Custom Claude Code plugins for codebase analysis, skill generation, and workflow automation.
 
 ## Installation
 
@@ -73,12 +73,46 @@ Analyzes codebases and generates tailored Claude Code skills. **11 specialized a
 └── monitoring/     (if detected)
 ```
 
+---
+
+### issue-lifecycle (v1.0.0)
+
+Automates the full lifecycle of working on Linear issues — from planning through PR creation. Integrates **Linear**, **Beads task tracking**, and **GitHub PRs** with Conventional Commits.
+
+#### Prerequisites
+
+- Linear MCP plugin, Beads CLI (`bd`), GitHub CLI (`gh`)
+
+#### Commands
+
+| Command | Description |
+|---------|-------------|
+| `/issue-start <ID>` | Fetch issue, create plan, Beads tasks, branch, update Linear |
+| `/issue-task [ID]` | Work on next unblocked task, present for review |
+| `/commit` | Semantic commit + close Beads task |
+| `/issue-finish [ID]` | Push, create PR, update Linear, post completion comment |
+
+#### Workflow
+
+```
+/issue-start ONC-5 → /issue-task → /commit → /issue-finish
+```
+
+---
+
 ## Workflow
 
+**stackgen:**
 1. **Analyze project**: `/stackgen:analyze`
 2. **Quick context**: `/stackgen:quick`
 3. **After upgrades**: `/stackgen:refresh`
 4. **Maintenance**: `/stackgen:check`
+
+**issue-lifecycle:**
+1. **Start issue**: `/issue-start ONC-5`
+2. **Work on tasks**: `/issue-task` (repeat)
+3. **Commit work**: `/commit` (after review)
+4. **Finish issue**: `/issue-finish`
 
 ## License
 
