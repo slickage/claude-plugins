@@ -5,7 +5,7 @@
     "email": "crod951@gmail.com"
   },
   "metadata": {
-    "description": "Custom Claude Code plugins for codebase analysis and skill generation"
+    "description": "Custom Claude Code plugins for codebase analysis, skill generation, and workflow automation"
   },
   "plugins": [
     {
@@ -25,6 +25,25 @@
         "testing",
         "database",
         "ai"
+      ]
+    },
+    {
+      "name": "issue-lifecycle",
+      "source": "./plugins/issue-lifecycle",
+      "description": "Automates the full lifecycle of working on Linear issues — from planning through PR creation. Integrates Linear, Beads task tracking, and GitHub PRs with Conventional Commits.",
+      "version": "1.0.0",
+      "author": {
+        "name": "crod951"
+      },
+      "repository": "https://github.com/crod951/claude-plugins",
+      "keywords": [
+        "linear",
+        "beads",
+        "github",
+        "issue-tracking",
+        "conventional-commits",
+        "workflow",
+        "automation"
       ]
     }
   ]
