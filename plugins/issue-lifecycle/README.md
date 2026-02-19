@@ -23,13 +23,19 @@ After installing, follow the Linear plugin's setup instructions to authenticate 
 **Beads CLI** — persistent task tracking across Claude Code sessions
 
 ```bash
-npm install -g @anthropic/beads
+brew install beads        # macOS/Linux (recommended)
+```
+
+Or via the universal install script:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh | bash
 ```
 
 Verify it's available:
 
 ```bash
-bd --version
+bd version
 ```
 
 > Beads is initialized per-project automatically the first time you run `/issue-start`.
