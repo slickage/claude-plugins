@@ -1,6 +1,6 @@
 ---
 description: Start working on a Linear issue - fetches issue, creates plan, Beads tasks, and feature branch
-argument-hint: Linear issue ID (e.g., ONC-5)
+argument-hint: "<ISSUE-ID> [--auto] [--no-confirm]"
 ---
 
 ## Context
@@ -16,16 +16,31 @@ You are starting work on Linear issue: **$ARGUMENTS**
 
 Follow these steps precisely:
 
-### Step 1: Fetch the Linear issue
+### Step 1: Parse arguments and flags
+
+Parse `$ARGUMENTS` to extract:
+
+- **Issue ID:** The required non-flag argument (e.g., `ONC-5`).
+- **`--auto`:** If present, after plan approval and setup, automatically continue into auto-loop mode (implement all tasks, commit each, and finish the issue).
+- **`--no-confirm`:** If present (requires `--auto`), skip the plan approval pause — auto-approve the plan and proceed immediately.
+
+Examples:
+- `/issue-start ONC-5` → normal manual flow
+- `/issue-start ONC-5 --auto` → plan with approval pause, then auto-loop all tasks + finish
+- `/issue-start ONC-5 --auto --no-confirm` → fully autonomous, no pauses
+
+Use the extracted issue ID for all subsequent steps where `$ARGUMENTS` was previously referenced.
+
+### Step 2: Fetch the Linear issue
 
 Use the `mcp__plugin_linear_linear__get_issue` tool with id: `$ARGUMENTS`.
 Save the response — you'll need the title, description, labels, URL, and UUID (id field).
 
-### Step 2: Research the codebase
+### Step 3: Research the codebase
 
 Based on the issue description, use Glob, Grep, and Read to search the codebase for relevant files (models, controllers, views, services, tests). Understand the existing architecture that relates to this issue. Be thorough — this context feeds the plan.
 
-### Step 3: Write the plan document
+### Step 4: Write the plan document
 
 Create the directory `docs/plans/` if it doesn't exist, then write the plan to `docs/plans/<ISSUE-ID>.md` (e.g., `docs/plans/ONC-5.md`).
 
@@ -35,7 +50,7 @@ Plan format:
 # <Issue Title> — <ISSUE-ID>
 
 > **Linear:** <issue URL>
-> **Branch:** <branch name (determined in step 7)>
+> **Branch:** <branch name (determined in step 8)>
 > **Date:** <today's date>
 > **Status:** In Progress
 
@@ -66,7 +81,7 @@ Plan format:
 <Gotchas, risks, decisions, alternative approaches considered>
 ```
 
-### Step 4: Present the plan for review
+### Step 5: Present the plan for review
 
 Show the user a summary of the plan:
 
@@ -87,15 +102,19 @@ Show the user a summary of the plan:
 ------------------------------------
 ```
 
+**If `--no-confirm` flag is set (requires `--auto`):** Skip this approval step entirely — auto-approve the plan and continue directly to Step 6.
+
+**Otherwise**, present the plan for review:
+
 Then use `AskUserQuestion` to ask the user:
 - Question: "Does the plan look good? Ready to create Beads tasks and start the branch?"
-- Options: "Approve plan" (proceed to step 5), "I have changes" (wait for user to discuss edits)
+- Options: "Approve plan" (proceed to step 6), "I have changes" (wait for user to discuss edits)
 
-**If the user selects "I have changes":** Stop and wait. Let them discuss modifications. After they are satisfied and confirm, resume from Step 5.
+**If the user selects "I have changes":** Stop and wait. Let them discuss modifications. After they are satisfied and confirm, resume from Step 6.
 
-**If the user selects "Approve plan":** Continue to Step 5.
+**If the user selects "Approve plan":** Continue to Step 6.
 
-### Step 5: Initialize Beads (if needed)
+### Step 6: Initialize Beads (if needed)
 
 If the context above shows "BEADS_NOT_INITIALIZED", initialize Beads using the project directory name as the prefix:
 
@@ -105,7 +124,7 @@ bd init --prefix <project-directory-name> --skip-hooks
 
 For example, if the project directory is `oncuria`, run `bd init --prefix onc --skip-hooks`. Use a short, recognizable abbreviation of the project name (3-4 characters).
 
-### Step 6: Create Beads tasks
+### Step 7: Create Beads tasks
 
 For each task in the plan, create a Beads task:
 ```bash
@@ -121,7 +140,7 @@ bd dep add <child-id> <parent-id>
 
 Where `<child-id>` depends on `<parent-id>` completing first.
 
-### Step 7: Create and checkout the feature branch
+### Step 8: Create and checkout the feature branch
 
 Determine the branch prefix from the Linear issue labels:
 - "Feature" → `feat/`
@@ -139,13 +158,13 @@ Create the branch:
 git checkout -b <branch-name>
 ```
 
-### Step 8: Update Linear status to In Progress
+### Step 9: Update Linear status to In Progress
 
 Use `mcp__plugin_linear_linear__update_issue` with:
-- id: <the issue's UUID from step 1>
+- id: <the issue's UUID from step 2>
 - state: "In Progress"
 
-### Step 9: Present summary
+### Step 10: Present summary
 
 Show the user:
 
@@ -167,3 +186,5 @@ Show the user:
 
 --------------------------------
 ```
+
+**If `--auto` flag is set:** Do NOT show "Next: Run /issue-task" in the summary above. Instead, immediately continue into auto-loop mode. Execute the full auto-loop as defined in the `/issue-task` command's Auto-Loop Mode: implement all unblocked tasks continuously with inline commits (following Conventional Commits, safe staging, HEREDOC format), show progress summaries after each task, then finish the issue (push branch, create PR with `Closes <ISSUE-ID>`, update Linear to "In Review", post completion comment). Follow the `--on-failure=stop` default for failure handling.
