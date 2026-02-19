@@ -1,5 +1,7 @@
 # Issue-Task Auto-Loop Design
 
+**Status:** Implemented
+
 ## Problem
 
 The current `/issue-task` workflow requires manual invocation for each task cycle: `/issue-task` → review → `/commit` → repeat. Users want the option to run this autonomously.
