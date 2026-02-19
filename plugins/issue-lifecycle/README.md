@@ -11,10 +11,6 @@ This plugin depends on three external tools. Install and configure each one befo
 **Linear MCP plugin** — connects Claude Code to your Linear workspace
 
 ```bash
-# Add the Anthropic plugin marketplace (if you haven't already)
-/plugin marketplace add anthropics/claude-code-plugins
-
-# Install the Linear plugin
 /plugin install linear
 ```
 
