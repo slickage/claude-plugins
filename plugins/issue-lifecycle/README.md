@@ -78,6 +78,44 @@ You should see descriptions for each command. You're ready to go.
 | `/commit` | Semantic commit in Conventional Commits format (`type(ISSUE-ID): description`), closes active Beads task |
 | `/issue-finish [ID]` | Push branch, create PR with `Closes <ID>`, update Linear to In Review, post completion comment |
 
+### Auto-Loop Flags
+
+Both `/issue-start` and `/issue-task` support flags for autonomous execution.
+
+#### `/issue-task` flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--auto` | off | Loop through all unblocked tasks: implement, commit, and move to the next task automatically |
+| `--finish` | off | Run `/issue-finish` logic (push, PR, Linear update) after the last task completes. Requires `--auto` |
+| `--on-failure=stop\|skip` | `stop` | What to do when a task fails. `stop` halts the loop. `skip` reverts changes and continues to the next task. Requires `--auto` |
+
+#### `/issue-start` flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--auto` | off | After plan approval and setup, chain into auto-loop mode (implements all tasks, commits each, and finishes the issue) |
+| `--no-confirm` | off | Skip the plan approval pause and auto-approve. Requires `--auto` |
+
+#### Examples
+
+```bash
+# Auto-loop all tasks (manual start/finish)
+/issue-task --auto
+
+# Auto-loop + auto-finish when all tasks are done
+/issue-task --auto --finish
+
+# Auto-loop, skip failing tasks instead of stopping
+/issue-task --auto --on-failure=skip
+
+# Fully autonomous from a single command (pauses for plan approval)
+/issue-start ONC-5 --auto
+
+# Fully autonomous, zero pauses
+/issue-start ONC-5 --auto --no-confirm
+```
+
 ## Step-by-Step Guide
 
 This walkthrough takes you through a complete issue lifecycle using `ONC-5` as an example.
@@ -155,6 +193,8 @@ Alternate between `/issue-task` and `/commit` until all tasks are complete:
 
 When `/issue-task` finds no remaining tasks, it will tell you to run `/issue-finish`.
 
+> **Want to skip the manual loop?** Run `/issue-task --auto` to implement, commit, and advance through all tasks automatically. Add `--finish` to also push and create the PR when done. See [Auto-Loop Flags](#auto-loop-flags) for details.
+
 ### Step 5: Finish the issue
 
 ```
@@ -182,6 +222,8 @@ You'll get the PR URL — share it for code review. When the PR is merged, the L
 
 ## Workflow at a Glance
 
+**Manual (default):**
+
 ```
 /issue-start ONC-5       # Plan + review + setup
     ↓
@@ -194,9 +236,24 @@ You'll get the PR URL — share it for code review. When the PR is merged, the L
 /issue-finish             # Push + PR + Linear update
 ```
 
+**Autonomous:**
+
+```
+/issue-start ONC-5 --auto --no-confirm    # Everything, zero pauses
+```
+
+Or with plan approval:
+
+```
+/issue-start ONC-5 --auto    # Pause for plan review, then auto-loop everything
+```
+
 ## Features
 
 - **Plan approval checkpoint**: `/issue-start` pauses after creating the plan so you can review and tweak before Beads tasks are created
+- **Auto-loop mode**: `/issue-task --auto` implements all tasks continuously with inline commits — no manual intervention between tasks
+- **Fully autonomous option**: `/issue-start ONC-5 --auto --no-confirm` runs the entire lifecycle (plan → implement → commit → PR) with zero pauses
+- **Configurable failure handling**: `--on-failure=stop|skip` controls whether the auto-loop halts or skips tasks that fail
 - **Branch naming**: Auto-generates semantic branches from Linear labels (`feat/`, `fix/`, `chore/`, `docs/`)
 - **Conventional Commits**: `/commit` auto-detects commit type and formats as `type(ISSUE-ID): description`
 - **Safety rails**: `/issue-finish` warns on uncommitted changes and incomplete tasks

@@ -100,16 +100,41 @@ Automates the full lifecycle of working on Linear issues — from planning throu
 | `/commit` | Semantic commit + close Beads task |
 | `/issue-finish [ID]` | Push, create PR, update Linear, post completion comment |
 
+#### Auto-Loop Flags
+
+| Flag | Command | Description |
+|------|---------|-------------|
+| `--auto` | `/issue-task` | Loop through all tasks: implement, commit, next — automatically |
+| `--finish` | `/issue-task` | Also push + PR + Linear update after last task. Requires `--auto` |
+| `--on-failure=stop\|skip` | `/issue-task` | Halt on failure (default) or skip and continue. Requires `--auto` |
+| `--auto` | `/issue-start` | Chain into auto-loop after plan approval and setup |
+| `--no-confirm` | `/issue-start` | Skip plan approval pause. Requires `--auto` |
+
+```bash
+# Fully autonomous, zero pauses
+/issue-start ONC-5 --auto --no-confirm
+
+# Auto-loop tasks only (manual start/finish)
+/issue-task --auto
+
+# Auto-loop + auto-finish
+/issue-task --auto --finish --on-failure=skip
+```
+
 #### Features
 
 - **Plan-first workflow** — researches your codebase and writes a plan document before any code changes
 - **Review checkpoints** — pauses for your approval after planning and after each task implementation
+- **Auto-loop mode** — `--auto` implements all tasks continuously with inline commits, no manual steps between tasks
+- **Fully autonomous option** — `/issue-start --auto --no-confirm` runs the entire lifecycle with zero pauses
 - **Branch naming** — auto-generates semantic branches from Linear labels (`feat/`, `fix/`, `chore/`, `docs/`)
 - **Conventional Commits** — auto-detects commit type and formats as `type(ISSUE-ID): description`
 - **Safety rails** — warns on uncommitted changes, incomplete tasks, and issue ID mismatches
 - **Linear integration** — updates status to In Progress / In Review and posts completion comments
 
 #### Workflow
+
+**Manual (default):**
 
 ```
 /issue-start ONC-5       # Fetch issue → research → plan → review → branch
@@ -121,6 +146,12 @@ Automates the full lifecycle of working on Linear issues — from planning throu
   (repeat /issue-task + /commit for each task)
     ↓
 /issue-finish             # Pre-flight checks → push → PR → update Linear
+```
+
+**Autonomous:**
+
+```
+/issue-start ONC-5 --auto --no-confirm    # Everything, zero pauses
 ```
 
 #### Linear Status Lifecycle
@@ -141,11 +172,14 @@ See the [full step-by-step guide](./plugins/issue-lifecycle/README.md) for a det
 3. **After upgrades**: `/stackgen:refresh`
 4. **Maintenance**: `/stackgen:check`
 
-**issue-lifecycle:**
+**issue-lifecycle (manual):**
 1. **Start issue**: `/issue-start ONC-5`
 2. **Work on tasks**: `/issue-task` (repeat)
 3. **Commit work**: `/commit` (after review)
 4. **Finish issue**: `/issue-finish`
+
+**issue-lifecycle (autonomous):**
+1. **Everything**: `/issue-start ONC-5 --auto --no-confirm`
 
 ## License
 
