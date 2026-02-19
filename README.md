@@ -2,19 +2,16 @@
 
 Custom Claude Code plugins for codebase analysis, skill generation, and workflow automation.
 
-## Installation
+## Installation (inside Claude Code)
 
-### Add the Marketplace
+Run these commands **inside a Claude Code session** (they start with `/`):
 
-```bash
-/plugin marketplace add crod951/claude-plugins
 ```
-
-### Install a Plugin
-
-```bash
+/plugin marketplace add crod951/claude-plugins
 /plugin install stackgen@crod951
 ```
+
+> Individual plugins may have additional prerequisites that run in your **terminal** (e.g., `brew install`). See each plugin's README for details.
 
 ## Available Plugins
 
