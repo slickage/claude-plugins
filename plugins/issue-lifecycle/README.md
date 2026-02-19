@@ -4,17 +4,9 @@ Automates the full lifecycle of working on Linear issues — from planning throu
 
 ## Installation
 
-### 1. Install prerequisites
+### 1. Install prerequisites (terminal)
 
-This plugin depends on three external tools. Install and configure each one before proceeding.
-
-**Linear MCP plugin** — connects Claude Code to your Linear workspace
-
-```bash
-/plugin install linear
-```
-
-After installing, follow the Linear plugin's setup instructions to authenticate with your Linear workspace.
+This plugin depends on two external CLI tools. Install these in your **terminal** before proceeding.
 
 **Beads CLI** — persistent task tracking across Claude Code sessions
 
@@ -36,7 +28,7 @@ bd version
 
 > Beads is initialized per-project automatically the first time you run `/issue-start`.
 
-**GitHub CLI** — used to create pull requests from the terminal
+**GitHub CLI** — used to create pull requests
 
 ```bash
 brew install gh     # macOS
@@ -48,17 +40,19 @@ Then authenticate:
 gh auth login
 ```
 
-### 2. Install the plugin
+### 2. Install plugins (inside Claude Code)
 
-```bash
-# Add the marketplace
+Run these commands **inside a Claude Code session** (they start with `/`):
+
+```
+/plugin install linear
 /plugin marketplace add crod951/claude-plugins
-
-# Install issue-lifecycle
 /plugin install issue-lifecycle@crod951
 ```
 
-### 3. Verify
+After installing Linear, follow its setup instructions to authenticate with your Linear workspace.
+
+### 3. Verify (inside Claude Code)
 
 Start a new Claude Code session and confirm the commands are available:
 
