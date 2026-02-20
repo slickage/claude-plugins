@@ -1,41 +1,55 @@
 ---
 description: Finish a Linear issue - push branch, create PR, update Linear to In Review, post completion comment
-argument-hint: Optional Linear issue ID (infers from branch if omitted)
+argument-hint: "[ISSUE-ID] [--base <branch>]"
 ---
 
 ## Context
 
 - Current branch: !`git branch --show-current`
 - Git status: !`git status`
-- Commits on branch: !`git log main..HEAD --oneline 2>/dev/null || git log master..HEAD --oneline 2>/dev/null || echo "COULD_NOT_DETERMINE_BASE"`
+- Default branch: !`gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name' 2>/dev/null || echo "main"`
+- Commits on branch: !`git log $(gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name' 2>/dev/null || echo "main")..HEAD --oneline 2>/dev/null || echo "COULD_NOT_DETERMINE_BASE"`
 - All Beads tasks: !`bd list --all --limit 50 2>/dev/null || echo "NO_BEADS_DB"`
 - Open Beads tasks: !`bd list --status open --limit 10 2>/dev/null || echo "NONE_OPEN"`
 - Beads prefix: !`bd config get prefix 2>/dev/null || basename $(pwd) | cut -c1-3`
 
 ## Instructions
 
-You are finishing work on a Linear issue — pushing the branch, creating a PR, updating Linear status, and posting a completion comment. Follow these 8 steps precisely.
+You are finishing work on a Linear issue — pushing the branch, creating a PR, updating Linear status, and posting a completion comment. Follow these 9 steps precisely.
 
-### Step 1: Determine the issue ID
+### Step 1: Parse arguments and flags
+
+Parse `$ARGUMENTS` to extract:
+
+- **Issue ID:** Any non-flag argument (e.g., `ONC-5`). Optional — inferred from branch if omitted.
+- **`--base <branch>`:** Target branch for the PR. Defaults to the repo's default branch (from context above).
+
+Examples:
+- `/issue-finish` → infer issue ID from branch, PR targets default branch
+- `/issue-finish ONC-5` → explicit issue ID, PR targets default branch
+- `/issue-finish --base develop` → infer issue ID, PR targets `develop`
+- `/issue-finish ONC-5 --base develop` → explicit issue ID, PR targets `develop`
+
+### Step 2: Determine the issue ID
 
 Determine which Linear issue to finish:
 
-- **If `$ARGUMENTS` is provided and not empty:** use it as the issue ID (convert to UPPERCASE).
-- **If `$ARGUMENTS` is empty or not provided:** parse the issue ID from the current branch name. The branch format is `<prefix>/<issue-id>-<slug>` (e.g., `feat/onc-5-add-audit-trail` -> `ONC-5`). Extract the issue ID portion and convert to UPPERCASE.
-- **Mismatch check:** if `$ARGUMENTS` was provided AND a branch-based issue ID can also be parsed, compare them. If they differ, **warn the user** clearly:
+- **If an issue ID was parsed from arguments:** use it (convert to UPPERCASE).
+- **If no issue ID in arguments:** parse from the current branch name. The branch format is `<prefix>/<issue-id>-<slug>` (e.g., `feat/onc-5-add-audit-trail` -> `ONC-5`). Extract the issue ID portion and convert to UPPERCASE.
+- **Mismatch check:** if both an argument issue ID and branch issue ID exist and they differ, **warn the user** clearly:
   ```
   WARNING: Argument issue ID (<arg>) does not match branch issue ID (<branch>).
   Branch: <current branch>
   ```
   Ask the user to confirm which issue they want to finish before proceeding. Do NOT continue until the user confirms.
 
-If neither `$ARGUMENTS` nor the branch yields a valid issue ID, tell the user and stop.
+If neither arguments nor the branch yields a valid issue ID, tell the user and stop.
 
-### Step 2: Pre-flight checks
+### Step 3: Pre-flight checks
 
 Perform these checks before proceeding:
 
-#### 2a. Uncommitted changes
+#### 3a. Uncommitted changes
 
 Check the git status from context above. If there are ANY uncommitted changes (staged or unstaged, untracked files that appear to be project files), **STOP** and tell the user:
 
@@ -45,7 +59,7 @@ STOP: You have uncommitted changes. Please run /commit first to commit your work
 
 Do NOT proceed past this step if uncommitted changes exist.
 
-#### 2b. Incomplete Beads tasks
+#### 3b. Incomplete Beads tasks
 
 Check the open Beads tasks from context above. If there are any open or in-progress tasks remaining (and context does not show "NONE_OPEN" or "NO_BEADS_DB"), **warn the user** with the list of incomplete tasks:
 
@@ -61,13 +75,13 @@ Do you want to proceed with finishing the issue anyway?
 
 Use `AskUserQuestion` to ask the user to confirm before continuing. If they say no, stop. If they say yes, proceed.
 
-### Step 3: Fetch the Linear issue
+### Step 4: Fetch the Linear issue
 
-Use `mcp__plugin_linear_linear__get_issue` with id: `<ISSUE-ID>` (the ID determined in Step 1).
+Use `mcp__plugin_linear_linear__get_issue` with id: `<ISSUE-ID>` (the ID determined in Step 2).
 
 Save the response — you will need the **title**, **description**, **URL**, and **UUID** (the `id` field) for subsequent steps.
 
-### Step 4: Push the branch
+### Step 5: Push the branch
 
 Push the current branch to origin:
 
@@ -77,11 +91,12 @@ git push -u origin <branch-name>
 
 Where `<branch-name>` is the current branch from context above.
 
-### Step 5: Create the Pull Request
+### Step 6: Create the Pull Request
 
 Create a pull request using `gh pr create`. Build the PR with:
 
-- **Title:** The Linear issue title (from Step 3)
+- **Base branch:** Use the `--base` value from Step 1 (or the repo's default branch if not specified).
+- **Title:** The Linear issue title (from Step 4)
 - **Body** must include all of the following sections:
   1. `Closes <ISSUE-ID>` — this line triggers the Linear GitHub integration for auto-linking
   2. A summary section with 2-3 bullet points derived from the commits on the branch and the Beads tasks
@@ -92,7 +107,7 @@ Create a pull request using `gh pr create`. Build the PR with:
 Use HEREDOC format for the body:
 
 ```bash
-gh pr create --title "<Linear issue title>" --body "$(cat <<'EOF'
+gh pr create --base <base-branch> --title "<Linear issue title>" --body "$(cat <<'EOF'
 Closes <ISSUE-ID>
 
 ## Summary
@@ -121,13 +136,13 @@ EOF
 
 Capture the PR URL from the output of `gh pr create`.
 
-### Step 6: Update Linear status to In Review
+### Step 7: Update Linear status to In Review
 
 Use `mcp__plugin_linear_linear__update_issue` with:
-- id: `<the issue's UUID from Step 3>`
+- id: `<the issue's UUID from Step 4>`
 - state: "In Review"
 
-### Step 7: Post completion comment on Linear
+### Step 8: Post completion comment on Linear
 
 Use `mcp__plugin_linear_linear__create_comment` to post a comment on the issue. Use the Beads prefix from the context above. The comment body must follow this format:
 
@@ -150,7 +165,7 @@ PR: <PR-URL>
 
 Use the actual unicode/emoji characters for checkmarks. List all Beads tasks — mark completed ones with a checkmark and incomplete ones (if any were skipped with user confirmation) with a warning indicator.
 
-### Step 8: Show final summary
+### Step 9: Show final summary
 
 Present the following summary to the user:
 

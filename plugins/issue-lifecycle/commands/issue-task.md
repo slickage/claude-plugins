@@ -285,14 +285,20 @@ If `--finish` was set, proceed to finish the issue. Execute the following steps 
 **10A.2 — Fetch the Linear issue:**
 Use `mcp__plugin_linear_linear__get_issue` with id: `<ISSUE-ID>`.
 
-**10A.3 — Push the branch:**
+**10A.3 — Detect the base branch:**
+```bash
+gh repo view --json defaultBranchRef --jq '.defaultBranchRef.name'
+```
+Use the result as the base branch for the PR (falls back to `main` if the command fails).
+
+**10A.4 — Push the branch:**
 ```bash
 git push -u origin <branch-name>
 ```
 
-**10A.4 — Create the Pull Request:**
+**10A.5 — Create the Pull Request:**
 ```bash
-gh pr create --title "<Linear issue title>" --body "$(cat <<'EOF'
+gh pr create --base <base-branch> --title "<Linear issue title>" --body "$(cat <<'EOF'
 Closes <ISSUE-ID>
 
 ## Summary
@@ -321,12 +327,12 @@ EOF
 
 Capture the PR URL.
 
-**10A.5 — Update Linear status:**
+**10A.6 — Update Linear status:**
 Use `mcp__plugin_linear_linear__update_issue` with:
 - id: `<issue UUID>`
 - state: "In Review"
 
-**10A.6 — Post completion comment on Linear:**
+**10A.7 — Post completion comment on Linear:**
 Use `mcp__plugin_linear_linear__create_comment` to post a comment on the issue with:
 
 ```
@@ -349,7 +355,7 @@ All implementation tasks have been completed:
 PR: <PR-URL>
 ```
 
-**10A.7 — Show finish summary:**
+**10A.8 — Show finish summary:**
 
 ```
 --- Issue Finished (Auto) ───────────────

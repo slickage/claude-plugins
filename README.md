@@ -106,6 +106,7 @@ Automates the full lifecycle of working on Linear issues — from planning throu
 | `--on-failure=stop\|skip` | `/issue-task` | Halt on failure (default) or skip and continue. Requires `--auto` |
 | `--auto` | `/issue-start` | Chain into auto-loop after plan approval and setup |
 | `--no-confirm` | `/issue-start` | Skip plan approval pause. Requires `--auto` |
+| `--base <branch>` | `/issue-finish` | Target branch for the PR. Auto-detects repo default if omitted |
 
 ```bash
 # Fully autonomous, zero pauses

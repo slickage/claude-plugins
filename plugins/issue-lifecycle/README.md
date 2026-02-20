@@ -74,6 +74,12 @@ You should see descriptions for each command. You're ready to go.
 | `/commit` | Semantic commit in Conventional Commits format (`type(ISSUE-ID): description`), closes active Beads task |
 | `/issue-finish [ID]` | Push branch, create PR with `Closes <ID>`, update Linear to In Review, post completion comment |
 
+### `/issue-finish` flags
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--base <branch>` | repo default branch | Target branch for the PR. Auto-detected via `gh repo view` if not specified |
+
 ### Auto-Loop Flags
 
 Both `/issue-start` and `/issue-task` support flags for autonomous execution.
