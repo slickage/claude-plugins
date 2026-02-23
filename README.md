@@ -7,8 +7,8 @@ Custom Claude Code plugins for codebase analysis, skill generation, and workflow
 Run these commands **inside a Claude Code session** (they start with `/`):
 
 ```
-/plugin marketplace add crod951/claude-plugins
-/plugin install stackgen@crod951
+/plugin marketplace add slickage/claude-plugins
+/plugin install stackgen@slickage
 ```
 
 > Individual plugins may have additional prerequisites that run in your **terminal** (e.g., `brew install`). See each plugin's README for details.
@@ -85,7 +85,7 @@ Automates the full lifecycle of working on Linear issues — from planning throu
 #### Install
 
 ```bash
-/plugin install issue-lifecycle@crod951
+/plugin install issue-lifecycle@slickage
 ```
 
 #### Commands

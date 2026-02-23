@@ -1,8 +1,7 @@
 {
-  "name": "crod951",
+  "name": "slickage",
   "owner": {
-    "name": "crod951",
-    "email": "crod951@gmail.com"
+    "name": "slickage"
   },
   "metadata": {
     "description": "Custom Claude Code plugins for codebase analysis, skill generation, and workflow automation"
@@ -14,9 +13,9 @@
       "description": "Analyzes codebases and generates tailored Claude Code skills. 11 specialized agents with optimized context passing.",
       "version": "1.0.0",
       "author": {
-        "name": "crod951"
+        "name": "slickage"
       },
-      "repository": "https://github.com/crod951/claude-plugins",
+      "repository": "https://github.com/slickage/claude-plugins",
       "keywords": [
         "skills",
         "analysis",
@@ -31,11 +30,11 @@
       "name": "issue-lifecycle",
       "source": "./plugins/issue-lifecycle",
       "description": "Automates the full lifecycle of working on Linear issues — from planning through PR creation. Integrates Linear, Beads task tracking, and GitHub PRs with Conventional Commits.",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "author": {
-        "name": "crod951"
+        "name": "slickage"
       },
-      "repository": "https://github.com/crod951/claude-plugins",
+      "repository": "https://github.com/slickage/claude-plugins",
       "keywords": [
         "linear",
         "beads",

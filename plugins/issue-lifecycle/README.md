@@ -46,8 +46,8 @@ Run these commands **inside a Claude Code session** (they start with `/`):
 
 ```
 /plugin install linear
-/plugin marketplace add crod951/claude-plugins
-/plugin install issue-lifecycle@crod951
+/plugin marketplace add slickage/claude-plugins
+/plugin install issue-lifecycle@slickage
 ```
 
 After installing Linear, follow its setup instructions to authenticate with your Linear workspace.

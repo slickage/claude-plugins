@@ -3,11 +3,10 @@
   "version": "2.0.0",
   "description": "Automates the full lifecycle of working on Linear issues — from planning through PR creation. Integrates Linear, Beads task tracking, and GitHub PRs with Conventional Commits.",
   "author": {
-    "name": "crod951",
-    "email": "crod951@gmail.com"
+    "name": "slickage"
   },
-  "homepage": "https://github.com/crod951/claude-plugins",
-  "repository": "https://github.com/crod951/claude-plugins",
+  "homepage": "https://github.com/slickage/claude-plugins",
+  "repository": "https://github.com/slickage/claude-plugins",
   "license": "MIT",
   "keywords": [
     "linear",
