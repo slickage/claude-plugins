@@ -40,7 +40,24 @@ Save the response — you'll need the title, description, labels, URL, and UUID 
 
 Based on the issue description, use Glob, Grep, and Read to search the codebase for relevant files (models, controllers, views, services, tests). Understand the existing architecture that relates to this issue. Be thorough — this context feeds the plan.
 
-### Step 4: Write the plan document
+### Step 4: Ask clarifying questions (if needed)
+
+After reviewing the issue description and researching the codebase, evaluate whether the requirements are clear enough to write a solid plan. If there are ambiguities, missing details, or multiple valid interpretations, use `AskUserQuestion` to clarify before writing the plan.
+
+Common reasons to ask:
+- The issue description is vague about scope or expected behavior
+- Multiple implementation approaches are viable and the choice affects the plan significantly
+- Business logic or edge cases are not specified
+- It's unclear which parts of the codebase should be modified
+- The issue references external systems, APIs, or dependencies you don't have context on
+
+**If `--no-confirm` is set:** Skip this step — proceed directly to writing the plan using your best judgment.
+
+**If everything is clear:** Skip this step — proceed to Step 5.
+
+**If you have questions:** Ask them using `AskUserQuestion` (prefer multiple-choice options when possible). Wait for answers before proceeding. You may ask follow-up questions if the answers surface new ambiguities.
+
+### Step 5: Write the plan document
 
 Create the directory `docs/plans/` if it doesn't exist, then write the plan to `docs/plans/<ISSUE-ID>.md` (e.g., `docs/plans/ONC-5.md`).
 
@@ -50,7 +67,7 @@ Plan format:
 # <Issue Title> — <ISSUE-ID>
 
 > **Linear:** <issue URL>
-> **Branch:** <branch name (determined in step 8)>
+> **Branch:** <branch name (determined in step 9)>
 > **Date:** <today's date>
 > **Status:** In Progress
 
@@ -81,7 +98,7 @@ Plan format:
 <Gotchas, risks, decisions, alternative approaches considered>
 ```
 
-### Step 5: Present the plan for review
+### Step 6: Present the plan for review
 
 Show the user a summary of the plan:
 
@@ -102,19 +119,19 @@ Show the user a summary of the plan:
 ------------------------------------
 ```
 
-**If `--no-confirm` flag is set (requires `--auto`):** Skip this approval step entirely — auto-approve the plan and continue directly to Step 6.
+**If `--no-confirm` flag is set (requires `--auto`):** Skip this approval step entirely — auto-approve the plan and continue directly to Step 7.
 
 **Otherwise**, present the plan for review:
 
 Then use `AskUserQuestion` to ask the user:
 - Question: "Does the plan look good? Ready to create Beads tasks and start the branch?"
-- Options: "Approve plan" (proceed to step 6), "I have changes" (wait for user to discuss edits)
+- Options: "Approve plan" (proceed to step 7), "I have changes" (wait for user to discuss edits)
 
-**If the user selects "I have changes":** Stop and wait. Let them discuss modifications. After they are satisfied and confirm, resume from Step 6.
+**If the user selects "I have changes":** Stop and wait. Let them discuss modifications. After they are satisfied and confirm, resume from Step 7.
 
-**If the user selects "Approve plan":** Continue to Step 6.
+**If the user selects "Approve plan":** Continue to Step 7.
 
-### Step 6: Initialize Beads (if needed)
+### Step 7: Initialize Beads (if needed)
 
 If the context above shows "BEADS_NOT_INITIALIZED", initialize Beads using the project directory name as the prefix:
 
@@ -124,7 +141,7 @@ bd init --prefix <project-directory-name> --skip-hooks
 
 For example, if the project directory is `oncuria`, run `bd init --prefix onc --skip-hooks`. Use a short, recognizable abbreviation of the project name (3-4 characters).
 
-### Step 7: Create Beads tasks
+### Step 8: Create Beads tasks
 
 For each task in the plan, create a Beads task:
 ```bash
@@ -140,7 +157,7 @@ bd dep add <child-id> <parent-id>
 
 Where `<child-id>` depends on `<parent-id>` completing first.
 
-### Step 8: Create and checkout the feature branch
+### Step 9: Create and checkout the feature branch
 
 Determine the branch prefix from the Linear issue labels:
 - "Feature" → `feat/`
@@ -158,13 +175,13 @@ Create the branch:
 git checkout -b <branch-name>
 ```
 
-### Step 9: Update Linear status to In Progress
+### Step 10: Update Linear status to In Progress
 
 Use `mcp__plugin_linear_linear__update_issue` with:
 - id: <the issue's UUID from step 2>
 - state: "In Progress"
 
-### Step 10: Present summary
+### Step 11: Present summary
 
 Show the user:
 
