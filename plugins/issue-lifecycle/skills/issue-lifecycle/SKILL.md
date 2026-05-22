@@ -19,7 +19,7 @@ This skill **encompasses the full lifecycle** — there are no separate start/ta
 
 ## Shared references — read before acting
 
-- **`../shared/config.md`** — resolve the active provider from `.issue-lifecycle.json`.
+- **`../shared/resolution.md`** — infer the active provider at runtime (no config file).
 - **`../shared/providers.md`** — the provider contract; how Linear and Jira implement it.
 - **`../shared/breakdown-and-link.md`** — the breakdown + sub-issue + parent-task core (incl. **adopt**).
 - **`../shared/commit-and-close.md`** — per-task commit, `bd close`, sub-issue → Done.
@@ -28,7 +28,7 @@ This skill **encompasses the full lifecycle** — there are no separate start/ta
 
 ### 1. Resolve provider
 
-Read `.issue-lifecycle.json` per `config.md`. If the configured provider's MCP is not connected, stop with a clear message.
+Infer the active tracker per `resolution.md` (from the issue ID/branch, existing BEADS external-refs, and the connected MCP). The Lifecycle skill inherits the issue's team/project — it never resolves a destination. If the resolved provider's MCP is not connected, stop with a clear message.
 
 ### 2. Determine the issue ID
 

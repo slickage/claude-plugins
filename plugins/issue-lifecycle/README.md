@@ -55,22 +55,12 @@ Install and authenticate the MCP for your tracker:
 
 ## Configuration
 
-Create `.issue-lifecycle.json` at the repo root to declare the active tracker. The provider is **never** guessed from issue-ID format.
+**None.** No config file. The skills infer the tracker and destination at runtime:
 
-```json
-{
-  "provider": "linear",
-  "linear": { "teamKey": "ONC" },
-  "jira": {
-    "cloudId": "your-atlassian-cloud-id",
-    "projectKey": "PROJ",
-    "subtaskIssueType": "Sub-task",
-    "states": { "inProgress": "In Progress", "inReview": "In Review", "done": "Done" }
-  }
-}
-```
+- **Provider** (Linear vs Jira) — from an explicit mention in the request → existing issues in this repo (BEADS external-refs, branch issue IDs) → the connected tracker MCP → otherwise ask.
+- **Destination** (team/project) — Intake only — from a team/project named in the request → the team/project of a recent issue created in this repo → otherwise list the available teams/projects from the MCP and ask, remembering nothing (the created issue is the signal next time).
 
-If the file is missing, the provider defaults to `linear`. If the configured provider's MCP isn't connected, the skills stop with a clear message rather than half-working.
+If the resolved provider's MCP isn't connected, the skills stop with a clear message rather than half-working. See `skills/shared/resolution.md`.
 
 ## Skills
 
@@ -115,7 +105,7 @@ skills/
   issue-intake/SKILL.md       # Skill B — requirements → scaffold
   issue-lifecycle/SKILL.md    # Skill A — issue → PR
   shared/
-    config.md                 # .issue-lifecycle.json resolution
+    resolution.md             # runtime provider + destination inference (no config file)
     providers.md              # provider contract (Linear MCP / Jira Atlassian MCP)
     breakdown-and-link.md     # breakdown + sub-issues + parent task (adopt/invent)
     commit-and-close.md       # conventional commit + bd close + sub-issue → Done

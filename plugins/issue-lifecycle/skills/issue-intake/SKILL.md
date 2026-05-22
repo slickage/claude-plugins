@@ -18,15 +18,15 @@ This skill **only does intake**. It does not implement, branch, or commit. Imple
 
 ## Shared references — read before acting
 
-- **`../shared/config.md`** — resolve the active provider from `.issue-lifecycle.json`.
-- **`../shared/providers.md`** — the provider contract; `createIssue` / `createSubIssue`.
+- **`../shared/resolution.md`** — infer provider + destination at runtime (no config file).
+- **`../shared/providers.md`** — the provider contract; `createIssue` / `createSubIssue` / `listDestinations`.
 - **`../shared/breakdown-and-link.md`** — the breakdown + sub-issue + parent-task core (use the **invent** path).
 
 ## Procedure
 
 ### 1. Resolve provider
 
-Read `.issue-lifecycle.json` per `config.md`. If the configured provider's MCP is not connected, stop with a clear message.
+Infer the active tracker per `resolution.md` (explicit mention → existing repo artifacts → connected MCP → ask). If the resolved provider's MCP is not connected, stop with a clear message.
 
 ### 2. Gather requirements
 
@@ -40,15 +40,19 @@ Use Glob/Grep/Read to ground the breakdown in the real codebase (relevant files,
 
 If the requirements are too vague to produce a sensible main issue + breakdown (unclear scope, multiple incompatible interpretations, missing core behavior), use `AskUserQuestion` with targeted multiple-choice questions. Otherwise proceed without asking.
 
-### 5. Create the main issue
+### 5. Resolve the destination
 
-`createIssue(title, description, type)` via the provider. Derive a clear title and a description capturing the requirements, scope, and acceptance criteria. Set the type/label so the Lifecycle skill picks the right branch prefix later (Feature/Story, Bug, Chore, Documentation). Save the new issue id/key + URL.
+Decide *where* the issue is created per `resolution.md`: a team/project named in the invocation → else infer from a recent issue already created in this repo (via a BEADS `external-ref` → `getIssue` → its team/project) → else `listDestinations()` and have the user pick with `AskUserQuestion`. Resolve the choice to the native id via `resolveDestination`. Do not write the choice to a file — the created issue is the signal next time.
 
-### 6. Scaffold sub-issues + BEADS tasks
+### 6. Create the main issue
+
+`createIssue(title, description, type, destination)` via the provider. Derive a clear title and a description capturing the requirements, scope, and acceptance criteria. Set the type/label so the Lifecycle skill picks the right branch prefix later (Feature/Story, Bug, Chore, Documentation). Save the new issue id/key + URL.
+
+### 7. Scaffold sub-issues + BEADS tasks
 
 Run `../shared/breakdown-and-link.md` against the new issue using the **invent** path: init BEADS if needed, create the parent BEADS task (paired to the main issue), create child tasks, create + link one sub-issue per child (1:1), set parent-blocked-by-children dependencies. Write `docs/plans/<ISSUE-ID>.md` as the human-readable plan.
 
-### 7. Show the scaffold
+### 8. Show the scaffold
 
 ```
 --- Issue Scaffolded ---
@@ -63,7 +67,7 @@ Run `../shared/breakdown-and-link.md` against the new issue using the **invent**
 ------------------------
 ```
 
-### 8. Offer handoff
+### 9. Offer handoff
 
 Use `AskUserQuestion`: "Scaffold ready for `<ISSUE-ID>`. Run the Issue Lifecycle skill now to start implementation?"
 

@@ -3,7 +3,7 @@
 Glossary for the issue-tracking standardization work. Terms only — no implementation detail.
 
 ## Tracker / Provider
-The external issue-tracking system: **Linear** or **Jira**. The skills talk to it through a single **provider** contract (`getIssue`, `updateState`, `createIssue`, `createSubIssue`, `comment`) so the same workflow runs against either. Provider is chosen by repo config, never guessed from issue-ID format. Linear is backed by the existing Linear MCP; Jira by the Atlassian Remote MCP. If the configured provider isn't wired, the skills refuse rather than half-work.
+The external issue-tracking system: **Linear** or **Jira**. The skills talk to it through a single **provider** contract (`getIssue`, `updateState`, `createIssue`, `createSubIssue`, `comment`, `listDestinations`, `resolveDestination`) so the same workflow runs against either. There is **no config file** — the provider and destination are inferred at runtime (explicit mention → existing repo issues → connected MCP → ask). Linear is backed by the existing Linear MCP; Jira by the Atlassian Remote MCP. If the resolved provider isn't wired, the skills refuse rather than half-work.
 
 ## Adopt
 When the **Lifecycle skill** meets a human-authored main issue that already has sub-issues but no BEADS tasks, it **adopts** them — creating one BEADS task per existing sub-issue (1:1) rather than inventing a competing breakdown. It only invents a breakdown when the issue has no children.

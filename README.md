@@ -88,7 +88,7 @@ Standardizes issue tracking across **Linear and Jira**. Two skills sharing one p
 /plugin install issue-lifecycle@slickage
 ```
 
-Then create `.issue-lifecycle.json` at the repo root declaring `provider` (`linear` or `jira`). Defaults to `linear` if absent.
+No config file — the skills infer the tracker (Linear vs Jira) and destination (team/project) at runtime from the request, existing issues in the repo, and the connected MCP, asking only when nothing can be inferred.
 
 #### Skills
 
