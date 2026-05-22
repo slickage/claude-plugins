@@ -1,275 +1,126 @@
 # issue-lifecycle
 
-Automates the full lifecycle of working on Linear issues — from planning through PR creation. Integrates Linear, Beads task tracking, and GitHub PRs with Conventional Commits.
+Standardizes issue tracking across **Linear and Jira**. Two skills:
+
+- **Issue Intake** — turn requirements into a scaffolded main issue with 1:1 linked sub-issues and BEADS tasks, then offer to hand off to implementation.
+- **Issue Lifecycle** — drive an existing issue from breakdown through implementation to an open PR, in one resumable autonomous pass.
+
+Both share one provider abstraction, so the same workflow runs against Linear or Jira. BEADS is the source of truth; state syncs one way, BEADS → tracker.
+
+## How it's structured
+
+```
+TRACKER                          BEADS
+main issue           <--1:1-->   parent task (blocked by all children)
+  sub-issue 1        <--1:1-->     child task 1
+  sub-issue 2        <--1:1-->     child task 2
+  sub-issue 3        <--1:1-->     child task 3
+```
+
+One child BEADS task per sub-issue. The parent task pairs with the main issue and closes last. Closing all children unblocks the parent → issue done.
 
 ## Installation
 
-### 1. Install prerequisites (terminal)
+### 1. Prerequisites (terminal)
 
-This plugin depends on two external CLI tools. Install these in your **terminal** before proceeding.
-
-**Beads CLI** — persistent task tracking across Claude Code sessions
+**Beads CLI** — persistent task tracking across sessions:
 
 ```bash
-brew install beads        # macOS/Linux (recommended)
-```
-
-Or via the universal install script:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh | bash
-```
-
-Verify it's available:
-
-```bash
+brew install beads        # or: curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh | bash
 bd version
 ```
 
-> Beads is initialized per-project automatically the first time you run `/issue-start`.
+> Beads is initialized per-project automatically on first run, using the project directory name as the prefix.
 
-**GitHub CLI** — used to create pull requests
-
-```bash
-brew install gh     # macOS
-```
-
-Then authenticate:
+**GitHub CLI** — used to create pull requests:
 
 ```bash
+brew install gh
 gh auth login
 ```
 
-### 2. Install plugins (inside Claude Code)
+### 2. Tracker MCP (inside Claude Code)
 
-Run these commands **inside a Claude Code session** (they start with `/`):
+Install and authenticate the MCP for your tracker:
+
+- **Linear** — `/plugin install linear`, then follow its auth steps.
+- **Jira** — install and authenticate the official **Atlassian Remote MCP** server. (No Jira MCP ships with this plugin.)
+
+### 3. Plugin (inside Claude Code)
 
 ```
-/plugin install linear
 /plugin marketplace add slickage/claude-plugins
 /plugin install issue-lifecycle@slickage
 ```
 
-After installing Linear, follow its setup instructions to authenticate with your Linear workspace.
+## Configuration
 
-### 3. Verify (inside Claude Code)
+Create `.issue-lifecycle.json` at the repo root to declare the active tracker. The provider is **never** guessed from issue-ID format.
 
-Start a new Claude Code session and confirm the commands are available:
-
-```
-/issue-start
-/issue-task
-/commit
-/issue-finish
-```
-
-You should see descriptions for each command. You're ready to go.
-
-## Commands
-
-| Command | Description |
-|---------|-------------|
-| `/issue-start <ID>` | Fetch Linear issue, research codebase, write plan, create Beads tasks, checkout branch, update Linear to In Progress |
-| `/issue-task [ID]` | Claim next unblocked Beads task, implement it, present for review. Infers issue ID from branch if omitted. |
-| `/commit` | Semantic commit in Conventional Commits format (`type(ISSUE-ID): description`), closes active Beads task |
-| `/issue-finish [ID]` | Push branch, create PR with `Closes <ID>`, update Linear to In Review, post completion comment |
-
-### `/issue-finish` flags
-
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--base <branch>` | repo default branch | Target branch for the PR. Auto-detected via `gh repo view` if not specified |
-
-### Auto-Loop Flags
-
-Both `/issue-start` and `/issue-task` support flags for autonomous execution.
-
-#### `/issue-task` flags
-
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--auto` | off | Loop through all unblocked tasks: implement, commit, and move to the next task automatically |
-| `--finish` | off | Run `/issue-finish` logic (push, PR, Linear update) after the last task completes. Requires `--auto` |
-| `--on-failure=stop\|skip` | `stop` | What to do when a task fails. `stop` halts the loop. `skip` reverts changes and continues to the next task. Requires `--auto` |
-
-#### `/issue-start` flags
-
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--auto` | off | After plan approval and setup, chain into auto-loop mode (implements all tasks, commits each, and finishes the issue) |
-| `--no-confirm` | off | Skip the plan approval pause and auto-approve. Requires `--auto` |
-
-#### Examples
-
-```bash
-# Auto-loop all tasks (manual start/finish)
-/issue-task --auto
-
-# Auto-loop + auto-finish when all tasks are done
-/issue-task --auto --finish
-
-# Auto-loop, skip failing tasks instead of stopping
-/issue-task --auto --on-failure=skip
-
-# Fully autonomous from a single command (pauses for plan approval)
-/issue-start ONC-5 --auto
-
-# Fully autonomous, zero pauses
-/issue-start ONC-5 --auto --no-confirm
+```json
+{
+  "provider": "linear",
+  "linear": { "teamKey": "ONC" },
+  "jira": {
+    "cloudId": "your-atlassian-cloud-id",
+    "projectKey": "PROJ",
+    "subtaskIssueType": "Sub-task",
+    "states": { "inProgress": "In Progress", "inReview": "In Review", "done": "Done" }
+  }
+}
 ```
 
-## Step-by-Step Guide
+If the file is missing, the provider defaults to `linear`. If the configured provider's MCP isn't connected, the skills stop with a clear message rather than half-working.
 
-This walkthrough takes you through a complete issue lifecycle using `ONC-5` as an example.
+## Skills
 
-### Step 1: Start the issue
+### Issue Intake
 
-```
-/issue-start ONC-5
-```
+Triggers on requests like "turn these requirements into an issue", "scaffold an issue from this PRD", "break these requirements into tickets".
 
-This kicks off the planning phase. Claude will:
+1. Resolve provider, gather requirements (args / referenced file / conversation), research the codebase.
+2. Clarify **only if** requirements are too thin to break down.
+3. Create the main issue, then create 1:1 sub-issues + parent/child BEADS tasks (the **scaffold**).
+4. Show the scaffold and **ask** whether to run Issue Lifecycle now.
 
-1. **Fetch the issue from Linear** — pulls the title, description, labels, and metadata
-2. **Research your codebase** — searches for relevant files, models, services, and tests related to the issue
-3. **Write a plan document** — saves a structured plan to `docs/plans/ONC-5.md` containing:
-   - Issue description
-   - Codebase context discovered during research
-   - Implementation approach
-   - Numbered task breakdown with file paths
-   - Testing strategy
-4. **Pause for your review** — you'll see a summary of the plan and be asked to approve it or request changes
+Intake does not implement, branch, or commit — it stops at a review-ready scaffold.
 
-> **This is a checkpoint.** Read the plan, discuss adjustments, and only approve once you're happy. The plan drives everything that follows.
+### Issue Lifecycle
 
-Once approved, Claude will:
+Triggers on requests like "start ONC-5", "work on this issue", "take this issue to a PR", or naming an issue ID.
 
-5. **Initialize Beads** (first time only) — sets up task tracking for the project
-6. **Create Beads tasks** — one task per plan item, with dependencies between sequential steps
-7. **Create a feature branch** — auto-named from the issue labels and title (e.g., `feat/onc-5-add-audit-trail`)
-8. **Update Linear to "In Progress"**
+1. Resolve provider; determine the issue ID (argument or branch name).
+2. Fetch the issue, research the codebase, ensure the feature branch and plan doc.
+3. Ensure the breakdown + scaffold exists:
+   - tasks already exist → skip;
+   - human-authored sub-issues exist → **adopt** them 1:1;
+   - nothing exists → **invent** the breakdown and create sub-issues.
+4. Move the issue to In Progress, then loop: claim task → sub-issue In Progress → implement → test → commit → `bd close` → sub-issue Done.
+5. When all children close: push, open the PR (`Closes <ID>`), move the issue to In Review, post a completion comment.
 
-You'll see a summary with your branch name, task list, and a prompt to start working.
+**Resumable single pass.** Every step is guarded by an observable artifact (branch / `bd list` / task `external-ref` / `gh pr`). Run it once; re-invoke to resume exactly where it stopped. **Zero mid-run confirmation** — inspect the scaffold and re-invoke to continue if you want a review point. On an unrecoverable test failure it **stops and holds**: changes kept, task left in-progress, reported.
 
-### Step 2: Work on the next task
+## Status lifecycle
 
 ```
-/issue-task
+Backlog → In Progress (lifecycle start) → In Review (PR opened) → Done (PR merge)
 ```
 
-> You don't need to pass the issue ID — it's inferred from the branch name.
+Sub-issues mirror their BEADS task: claimed → In Progress, closed → Done.
 
-Claude will:
-
-1. **Read the plan** from `docs/plans/ONC-5.md` for full context
-2. **Find the next unblocked task** from the Beads task list and claim it
-3. **Implement the task** — reading existing code, making focused changes, and running relevant tests
-4. **Present the results** — a summary of files changed and test results
-
-> **Claude will NOT commit or close the task.** This is your chance to review the implementation. Check the changes, ask questions, or request adjustments before moving on.
-
-### Step 3: Commit the work
+## Plugin layout
 
 ```
-/commit
+skills/
+  issue-intake/SKILL.md       # Skill B — requirements → scaffold
+  issue-lifecycle/SKILL.md    # Skill A — issue → PR
+  shared/
+    config.md                 # .issue-lifecycle.json resolution
+    providers.md              # provider contract (Linear MCP / Jira Atlassian MCP)
+    breakdown-and-link.md     # breakdown + sub-issues + parent task (adopt/invent)
+    commit-and-close.md       # conventional commit + bd close + sub-issue → Done
 ```
 
-Once you're satisfied with the implementation, run `/commit`. Claude will:
+## Migration from 2.x
 
-1. **Detect the commit type** from the changes (`feat`, `fix`, `chore`, `refactor`, etc.)
-2. **Stage the changed files** individually (never `git add .` — sensitive files are excluded)
-3. **Create a Conventional Commits message** formatted as `type(ONC-5): description`
-4. **Close the active Beads task**
-
-You'll see a summary with the commit message and how many tasks remain.
-
-### Step 4: Repeat for remaining tasks
-
-Alternate between `/issue-task` and `/commit` until all tasks are complete:
-
-```
-/issue-task    →  implement  →  review  →  /commit
-/issue-task    →  implement  →  review  →  /commit
-/issue-task    →  implement  →  review  →  /commit
-```
-
-When `/issue-task` finds no remaining tasks, it will tell you to run `/issue-finish`.
-
-> **Want to skip the manual loop?** Run `/issue-task --auto` to implement, commit, and advance through all tasks automatically. Add `--finish` to also push and create the PR when done. See [Auto-Loop Flags](#auto-loop-flags) for details.
-
-### Step 5: Finish the issue
-
-```
-/issue-finish
-```
-
-Claude will run through pre-flight checks first:
-
-- **Uncommitted changes?** You'll be told to run `/commit` first.
-- **Incomplete tasks?** You'll see a warning with the list and can choose to proceed or go back.
-
-If everything checks out, Claude will:
-
-1. **Push the branch** to origin
-2. **Create a Pull Request** with:
-   - Title from the Linear issue
-   - `Closes ONC-5` for auto-linking
-   - Summary derived from commits and tasks
-   - Completed tasks checklist
-   - Test plan
-3. **Update Linear to "In Review"**
-4. **Post a completion comment** on the Linear issue with a structured summary and PR link
-
-You'll get the PR URL — share it for code review. When the PR is merged, the Linear issue moves to "Done" automatically via the GitHub integration.
-
-## Workflow at a Glance
-
-**Manual (default):**
-
-```
-/issue-start ONC-5       # Plan + review + setup
-    ↓
-/issue-task               # Implement next task
-    ↓
-/commit                   # Commit + close task
-    ↓
-  (repeat until all tasks are done)
-    ↓
-/issue-finish             # Push + PR + Linear update
-```
-
-**Autonomous:**
-
-```
-/issue-start ONC-5 --auto --no-confirm    # Everything, zero pauses
-```
-
-Or with plan approval:
-
-```
-/issue-start ONC-5 --auto    # Pause for plan review, then auto-loop everything
-```
-
-## Features
-
-- **Plan approval checkpoint**: `/issue-start` pauses after creating the plan so you can review and tweak before Beads tasks are created
-- **Auto-loop mode**: `/issue-task --auto` implements all tasks continuously with inline commits — no manual intervention between tasks
-- **Fully autonomous option**: `/issue-start ONC-5 --auto --no-confirm` runs the entire lifecycle (plan → implement → commit → PR) with zero pauses
-- **Configurable failure handling**: `--on-failure=stop|skip` controls whether the auto-loop halts or skips tasks that fail
-- **Branch naming**: Auto-generates semantic branches from Linear labels (`feat/`, `fix/`, `chore/`, `docs/`)
-- **Conventional Commits**: `/commit` auto-detects commit type and formats as `type(ISSUE-ID): description`
-- **Safety rails**: `/issue-finish` warns on uncommitted changes and incomplete tasks
-- **Mismatch detection**: Commands warn if the explicit issue ID doesn't match the current branch
-- **Completion comments**: Posts structured completion summaries to Linear with task checklists
-
-## Linear Status Lifecycle
-
-```
-Todo → In Progress (/issue-start) → In Review (/issue-finish) → Done (PR merge)
-```
-
-## Per-Project Setup
-
-Each project needs Beads initialized once. `/issue-start` handles this automatically on first run, using the project directory name as the Beads prefix.
-
-Plan documents are written to `docs/plans/<ISSUE-ID>.md` as a paper trail.
+The four slash commands (`/issue-start`, `/issue-task`, `/commit`, `/issue-finish`) and their `--auto` / `--no-confirm` / `--finish` / `--on-failure` flags are **removed**. The full lifecycle is now one autonomous skill, and a separate Intake skill creates issues from requirements. Plans still live at `docs/plans/<ISSUE-ID>.md`.

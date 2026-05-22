@@ -1,7 +1,7 @@
 {
   "name": "issue-lifecycle",
-  "version": "2.1.0",
-  "description": "Automates the full lifecycle of working on Linear issues — from planning through PR creation. Integrates Linear, Beads task tracking, and GitHub PRs with Conventional Commits.",
+  "version": "3.0.0",
+  "description": "Standardizes issue tracking across Linear and Jira. Two skills: Issue Intake turns requirements into a scaffolded issue with linked sub-issues and BEADS tasks; Issue Lifecycle drives an existing issue from breakdown through implementation to an open PR. One-way BEADS→tracker sync, resumable autonomous runs.",
   "author": {
     "name": "slickage"
   },
@@ -10,9 +10,11 @@
   "license": "MIT",
   "keywords": [
     "linear",
+    "jira",
     "beads",
     "github",
     "issue-tracking",
+    "sub-issues",
     "conventional-commits",
     "pull-requests",
     "workflow",

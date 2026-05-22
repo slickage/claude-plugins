@@ -72,13 +72,13 @@ Analyzes codebases and generates tailored Claude Code skills. **11 specialized a
 
 ---
 
-### issue-lifecycle (v2.1.0)
+### issue-lifecycle (v3.0.0)
 
-Automates the full lifecycle of working on Linear issues — from planning through PR creation. Integrates **Linear**, **Beads task tracking**, and **GitHub PRs** with Conventional Commits.
+Standardizes issue tracking across **Linear and Jira**. Two skills sharing one provider abstraction: **Issue Intake** turns requirements into a scaffolded issue with linked sub-issues and BEADS tasks; **Issue Lifecycle** drives an existing issue from breakdown through implementation to an open PR. BEADS is the source of truth; state syncs one way (BEADS → tracker).
 
 #### Prerequisites
 
-- [Linear MCP plugin](https://github.com/anthropics/claude-code-plugins) installed and configured
+- A tracker MCP: the **Linear** plugin, or the official **Atlassian Remote MCP** for Jira (installed + authenticated separately)
 - [Beads CLI](https://github.com/steveyegge/beads) installed (`bd` command available)
 - [GitHub CLI](https://cli.github.com/) installed and authenticated (`gh` command available)
 
@@ -88,74 +88,34 @@ Automates the full lifecycle of working on Linear issues — from planning throu
 /plugin install issue-lifecycle@slickage
 ```
 
-#### Commands
+Then create `.issue-lifecycle.json` at the repo root declaring `provider` (`linear` or `jira`). Defaults to `linear` if absent.
 
-| Command | Description |
-|---------|-------------|
-| `/issue-start <ID>` | Fetch issue, create plan, Beads tasks, branch, update Linear |
-| `/issue-task [ID]` | Work on next unblocked task, present for review |
-| `/commit` | Semantic commit + close Beads task |
-| `/issue-finish [ID]` | Push, create PR, update Linear, post completion comment |
+#### Skills
 
-#### Auto-Loop Flags
+| Skill | Triggers on | Does |
+|-------|-------------|------|
+| **Issue Intake** | "turn these requirements into an issue", "scaffold from this PRD" | Creates main issue + 1:1 sub-issues + parent/child BEADS tasks, then offers to hand off |
+| **Issue Lifecycle** | "start ONC-5", "take this issue to a PR", an issue ID | Breakdown (or adopt) → implement every task with a commit each → PR → tracker In Review |
 
-| Flag | Command | Description |
-|------|---------|-------------|
-| `--auto` | `/issue-task` | Loop through all tasks: implement, commit, next — automatically |
-| `--finish` | `/issue-task` | Also push + PR + Linear update after last task. Requires `--auto` |
-| `--on-failure=stop\|skip` | `/issue-task` | Halt on failure (default) or skip and continue. Requires `--auto` |
-| `--auto` | `/issue-start` | Chain into auto-loop after plan approval and setup |
-| `--no-confirm` | `/issue-start` | Skip plan approval pause. Requires `--auto` |
-| `--base <branch>` | `/issue-finish` | Target branch for the PR. Auto-detects repo default if omitted |
-
-```bash
-# Fully autonomous, zero pauses
-/issue-start ONC-5 --auto --no-confirm
-
-# Auto-loop tasks only (manual start/finish)
-/issue-task --auto
-
-# Auto-loop + auto-finish
-/issue-task --auto --finish --on-failure=skip
-```
-
-#### Features
-
-- **Plan-first workflow** — researches your codebase and writes a plan document before any code changes
-- **Review checkpoints** — pauses for your approval after planning and after each task implementation
-- **Auto-loop mode** — `--auto` implements all tasks continuously with inline commits, no manual steps between tasks
-- **Fully autonomous option** — `/issue-start --auto --no-confirm` runs the entire lifecycle with zero pauses
-- **Branch naming** — auto-generates semantic branches from Linear labels (`feat/`, `fix/`, `chore/`, `docs/`)
-- **Conventional Commits** — auto-detects commit type and formats as `type(ISSUE-ID): description`
-- **Safety rails** — warns on uncommitted changes, incomplete tasks, and issue ID mismatches
-- **Linear integration** — updates status to In Progress / In Review and posts completion comments
-
-#### Workflow
-
-**Manual (default):**
+#### Structure
 
 ```
-/issue-start ONC-5       # Fetch issue → research → plan → review → branch
-    ↓
-/issue-task               # Claim next task → implement → present for review
-    ↓
-/commit                   # Stage → commit → close Beads task
-    ↓
-  (repeat /issue-task + /commit for each task)
-    ↓
-/issue-finish             # Pre-flight checks → push → PR → update Linear
+main issue   <--1:1-->  parent BEADS task (closes last)
+  sub-issue  <--1:1-->    child BEADS task   claim→In Progress, close→Done
 ```
 
-**Autonomous:**
+#### Behavior
+
+- **Resumable single pass** — guarded by observable artifacts (branch / `bd list` / task `external-ref` / `gh pr`); re-invoke to resume.
+- **Zero mid-run confirmation** — autonomous; inspect the scaffold and re-invoke for a review point.
+- **Adopt** human-authored sub-issues 1:1 instead of duplicating; **invent** a breakdown only when none exist.
+- **Stop and hold** on an unrecoverable test failure — changes kept, task left in-progress, reported.
+- **Conventional Commits** per task; semantic branch from issue label/type (`feat/`, `fix/`, `chore/`, `docs/`).
+
+#### Status lifecycle
 
 ```
-/issue-start ONC-5 --auto --no-confirm    # Everything, zero pauses
-```
-
-#### Linear Status Lifecycle
-
-```
-Todo → In Progress (/issue-start) → In Review (/issue-finish) → Done (PR merge)
+Backlog → In Progress (lifecycle start) → In Review (PR opened) → Done (PR merge)
 ```
 
 See the [full step-by-step guide](./plugins/issue-lifecycle/README.md) for a detailed walkthrough.
@@ -170,14 +130,12 @@ See the [full step-by-step guide](./plugins/issue-lifecycle/README.md) for a det
 3. **After upgrades**: `/stackgen:refresh`
 4. **Maintenance**: `/stackgen:check`
 
-**issue-lifecycle (manual):**
-1. **Start issue**: `/issue-start ONC-5`
-2. **Work on tasks**: `/issue-task` (repeat)
-3. **Commit work**: `/commit` (after review)
-4. **Finish issue**: `/issue-finish`
+**issue-lifecycle (from requirements):**
+1. **Scaffold**: "turn these requirements into an issue" → Issue Intake creates the issue + sub-issues + BEADS tasks
+2. **Implement**: accept the handoff → Issue Lifecycle runs to an open PR
 
-**issue-lifecycle (autonomous):**
-1. **Everything**: `/issue-start ONC-5 --auto --no-confirm`
+**issue-lifecycle (existing issue):**
+1. **Everything**: "start ONC-5" → Issue Lifecycle breaks down, implements, and opens the PR in one resumable pass
 
 ---
 
