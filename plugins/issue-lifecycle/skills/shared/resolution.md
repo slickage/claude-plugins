@@ -21,7 +21,9 @@ The Lifecycle skill works on an existing issue and **inherits** its team/project
 
 1. **Per-call hint** — a team/project named in the invocation ("create in the Platform team", "under PROJ"). Resolve it to the native id via `resolveDestination(hint)`.
 2. **Infer from prior issues in this repo** — take a recent issue created here (from a BEADS `external-ref` → `getIssue`), read its team/project, and reuse that destination. This is the "previous calls" path: the repo's own history is the memory.
-3. **Ask** — if there's no hint and nothing to infer from (first issue in a fresh repo), call `listDestinations()`, present the options with `AskUserQuestion`, and let the user pick.
+3. **Ask, in two steps** — if there's no hint and nothing to infer from (first issue in a fresh repo):
+   - **Team:** call `listDestinations()` and present the teams with `AskUserQuestion`. Use the viewer's **memberships** (Linear: `get_user("me").teams`), not the whole workspace. Warn that the list may still include an archived team the user belongs to — the MCP exposes no archived flag (see `providers.md`) — so the user's pick is the filter.
+   - **Project:** after the team is chosen, list that team's projects (`list_projects`) and ask which one, always including a **"Team backlog / no project"** option. A team with zero projects skips this step.
 
 Do not persist the choice to a file. The created issue itself becomes the signal step 2 reads next time.
 

@@ -23,7 +23,7 @@ Backed by the Linear MCP already present in the environment (`mcp__plugin_linear
 |---|---|
 | `getIssue` | `mcp__plugin_linear_linear__get_issue` (save the `id` UUID, `url`, `labels`) |
 | `listSubIssues` | `mcp__plugin_linear_linear__list_issues` filtered by `parentId` |
-| `listDestinations` | `mcp__plugin_linear_linear__list_teams` (and `list_projects` for the chosen team) |
+| `listDestinations` | `mcp__plugin_linear_linear__get_user` with `me` → use its `teams` (the viewer's **memberships**), then `list_projects` for the chosen team. Do **not** use `list_teams` — it returns the whole workspace including teams the viewer isn't on. Caveat: the MCP exposes no `archivedAt` field on teams (not in `list_teams`, `get_team`, or `get_user.teams`), so an archived team the viewer still belongs to cannot be filtered out programmatically — rely on the user's pick. |
 | `resolveDestination` | Match the team key/name (from the invocation hint or inferred from a prior issue) against `list_teams` to get the team **UUID** (`teamId`) — the key alone is not accepted by `create_issue`. If a project is given/inferred, validate it via `list_projects`. |
 | `createIssue` | `mcp__plugin_linear_linear__create_issue` with `teamId` = resolved team UUID (and `projectId` if resolved) |
 | `createSubIssue` | `mcp__plugin_linear_linear__create_issue` with `parentId` = main issue UUID (inherits the parent's team) |
