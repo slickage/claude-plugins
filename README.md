@@ -88,7 +88,7 @@ Standardizes issue tracking across **Linear and Jira**. Two skills sharing one p
 /plugin install issue-lifecycle@slickage
 ```
 
-No config file — the skills infer the tracker (Linear vs Jira) and destination (team/project) at runtime from the request, existing issues in the repo, and the connected MCP, asking only when nothing can be inferred.
+No config file and no persisted state — the skills infer the tracker (Linear vs Jira) and destination (team/project) at runtime from the request, the connected MCP, and the **local BEADS db** (`.beads/`) left by prior runs. The BEADS db is the only "memory": a fresh repo (or a wiped `.beads/`) has nothing to infer from, so Intake asks for team + project; a repo with prior runs reuses that destination silently.
 
 #### Skills
 

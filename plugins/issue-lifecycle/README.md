@@ -58,9 +58,19 @@ Install and authenticate the MCP for your tracker:
 **None.** No config file. The skills infer the tracker and destination at runtime:
 
 - **Provider** (Linear vs Jira) — from an explicit mention in the request → existing issues in this repo (BEADS external-refs, branch issue IDs) → the connected tracker MCP → otherwise ask.
-- **Destination** (team/project) — Intake only — from a team/project named in the request → the team/project of a recent issue created in this repo → otherwise list the available teams/projects from the MCP and ask, remembering nothing (the created issue is the signal next time).
+- **Destination** (team/project) — Intake only — from a team/project named in the request → the team/project of a recent issue created in this repo → otherwise list the available teams/projects from the MCP and ask.
 
 If the resolved provider's MCP isn't connected, the skills stop with a clear message rather than half-working. See `skills/shared/resolution.md`.
+
+### How "memory" works (important)
+
+There is **no persisted state** — no config file, no dotfile, nothing written to Claude memory. The only thing the skills infer from is the **local BEADS database** (`.beads/`): a prior run leaves tasks whose `external-ref` points back to the tracker issue (and thus its team/project), so the *next* run in the same repo reuses that destination silently.
+
+Consequences:
+- **Fresh repo / wiped `.beads`** → nothing to infer → Intake **asks** for team and project.
+- **`.beads` intact from a prior run** → Intake reuses the previous destination without asking.
+- Issues created in the tracker out-of-band (e.g. by hand in the UI, or by another machine) are **not** inference signals — only issues this repo's BEADS db has a reference to.
+- To force the ask again, remove `.beads/` (this also resets all local task state).
 
 ## Skills
 
