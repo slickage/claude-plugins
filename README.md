@@ -124,12 +124,13 @@ See the [full step-by-step guide](./plugins/issue-lifecycle/README.md) for a det
 
 ### slickage-skill (v0.1.0)
 
-The **ingest on-ramp** for this catalog. One command, `/slickage-skill:new`, scaffolds a conformant skill plugin — either from a short description you give, or by importing an existing local skill folder — registers it in `marketplace.json` via `bin/sync-versions.sh`, branches, and opens a PR with `gh`. PR review is the quality gate.
+The **ingest + catalog-sync on-ramp** for this catalog. `/slickage-skill:new` scaffolds a conformant plugin — a **skill**, a **hook**, or an **MCP** server — from a short description or by importing a local folder, then syncs `marketplace.json` and opens a PR. `/slickage-skill:sync-catalog` regenerates the README Catalog tables from the Notion catalog. PR review is the quality gate.
 
 #### Prerequisites
 
 - [GitHub CLI](https://cli.github.com/) installed and authenticated (`gh` command available)
 - Run from a clone of `slickage/claude-plugins`
+- `sync-catalog` additionally needs the **Notion MCP** connected in the session
 
 #### Install
 
@@ -137,32 +138,42 @@ The **ingest on-ramp** for this catalog. One command, `/slickage-skill:new`, sca
 /plugin install slickage-skill@slickage
 ```
 
-#### Command
+#### Commands
 
 | Command | Description |
 |---------|-------------|
-| `/slickage-skill:new <skill-name> [--from <path>]` | Scaffold a new skill plugin and open a PR. Omit `--from` to build from a two-line description; pass `--from <folder>` to import an existing local skill. |
+| `/slickage-skill:new <name> [--type skill\|hook\|mcp] [--from <path>]` | Scaffold a new plugin and open a PR. `--type` defaults to `skill` (also `hook`, `mcp`). Omit `--from` to build from a short description; pass `--from <folder>` to import an existing local folder (must contain `SKILL.md` / `hooks.json` / `.mcp.json` per type). |
+| `/slickage-skill:sync-catalog [--dry-run]` | Regenerate the README Catalog tables (Skills, MCP, Hooks) from the Notion catalog and open a PR. `--dry-run` shows the diff only. |
 
-To contribute a skill to the **Hosted here** set in the [Catalog](#catalog) below, run this command — don't hand-edit `marketplace.json`.
+To contribute a hosted entry to the [Catalog](#catalog) below, run `/slickage-skill:new` — don't hand-edit `marketplace.json`. To refresh the catalog after a Notion edit, run `/slickage-skill:sync-catalog`.
 
 ---
 
 ## Catalog
 
-This repo is Slickage's installable Claude Code skill catalog. The
-human-readable index lives in the Notion AI wiki ([AI] Claude Skills, MCP,
-Hooks); this README is the install surface. The endorsed set splits two ways.
+This repo is Slickage's installable Claude Code catalog. The human-readable
+index lives in the Notion AI wiki ([AI] Claude Skills, MCP, Hooks); this README
+is the install surface. Most entries are **referenced, not re-hosted** — install
+from their own source so upstream stays canonical. Things genuinely ours
+(`stackgen`, `issue-lifecycle`, `slickage-skill`, our hooks) are **hosted here**.
 
+The tables below are generated from the Notion catalog. To refresh them after a
+Notion edit, run `/slickage-skill:sync-catalog` (regenerates the marked sections
+and opens a PR). Add a new hosted entry with `/slickage-skill:new` (skills, hooks,
+or MCP — see the [slickage-skill](#slickage-skill-v010) plugin above).
+
+### Skills
+
+<!-- catalog:skills:start -->
 **Hosted here** — after `/plugin marketplace add slickage/claude-plugins`:
 
 | Skill | Install | What it does |
 |-------|---------|--------------|
 | `stackgen` | `/plugin install stackgen@slickage` | Analyzes codebases and generates tailored skills. |
 | `issue-lifecycle` | `/plugin install issue-lifecycle@slickage` | Standardizes issue tracking (Linear/Jira) from intake to PR. |
-| `slickage-skill` | `/plugin install slickage-skill@slickage` | Ingest on-ramp — scaffold a new skill and open a PR. |
+| `slickage-skill` | `/plugin install slickage-skill@slickage` | Ingest + catalog-sync on-ramp for this marketplace. |
 
-**Endorsed elsewhere** — referenced, not re-hosted; install from their own
-source so upstream stays canonical:
+**Endorsed elsewhere** — install from their own source:
 
 | Skill | Install | What it does |
 |-------|---------|--------------|
@@ -174,9 +185,28 @@ source so upstream stays canonical:
 | `beads-tasks` (`bd`) | `/plugin marketplace add boka-slickage/beads-claude-plugin` → `/plugin install beads-tasks@beads-claude-plugin` | Persistent, file-based task tracking that survives across sessions. |
 | `caveman` | `/plugin marketplace add JuliusBrussee/caveman` → `/plugin install caveman@caveman` | Ultra-compressed output mode — cuts ~75% of tokens, keeps technical accuracy. |
 | Claude in Chrome | Extension — install from [claude.ai/chrome](https://claude.ai/chrome) (not a `/plugin`) | Drives a Chrome browser from Claude for in-page tasks and debugging. |
+<!-- catalog:skills:end -->
 
-Found a skill worth sharing? Add it to the **Hosted here** set with
-`/slickage-skill:new`, or add a row to the Notion catalog for an external one.
+### MCP Integrations
+
+<!-- catalog:mcp:start -->
+| Integration | Install | What it does |
+|-------------|---------|--------------|
+| `notion` | `/plugin install notion@claude-plugins-official` | Read/write Notion pages and databases — search, create, query (this catalog was built with it). |
+| `context7` | `/plugin install context7@claude-plugins-official` | Fetches up-to-date library/framework/API docs on demand, avoiding stale training data. |
+| `linear` | `/plugin install linear@claude-plugins-official` | Read/write Linear issues, projects, comments, cycles, and documents from Claude. |
+<!-- catalog:mcp:end -->
+
+### Hooks & Tools
+
+<!-- catalog:hooks:start -->
+| Name | Type | Install / Config | What it does |
+|------|------|------------------|--------------|
+| caveman mode | Hook | `/plugin install caveman@caveman` (after `marketplace add JuliusBrussee/caveman`) + the node hooks wired in `settings.json` | Auto-enables ultra-compressed output (~75% fewer tokens) and keeps it active across the session. |
+| Finish sound | Hook | `Stop` hook in `~/.claude/settings.json`: `afplay /System/Library/Sounds/Funk.aiff` | Plays a macOS sound when Claude finishes a response — audible turn-done cue. |
+| rtk (Rust Token Killer) | CLI Tool | `brew install rtk` → `PreToolUse(Bash)` hook: `rtk hook claude` | Token-optimized CLI proxy — compresses command output to save 60–90% of tokens on dev ops. |
+| code-review-graph (greptile) | MCP | `/plugin install greptile@claude-plugins-official` | Semantic code-graph search — finds nodes, gives architecture overviews, powers deeper review. |
+<!-- catalog:hooks:end -->
 
 ---
 

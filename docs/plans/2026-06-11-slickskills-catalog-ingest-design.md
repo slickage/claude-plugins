@@ -137,6 +137,28 @@ Both resolved in the implementation plan
   native install string; only `issue-lifecycle` is hosted here. Locally hosted
   set stays `stackgen` + `issue-lifecycle` + the new `slickage-skill` plugin.
 
+## Addendum (2026-06-11) — multi-type ingest + catalog sync
+
+Two scope expansions landed in the MVP PR, after confirming via the Claude Code
+plugin docs that a single plugin can bundle skills, commands, agents, **hooks**
+(`hooks/hooks.json` + scripts via `${CLAUDE_PLUGIN_ROOT}`), and **MCP servers**
+(`.mcp.json`, local or remote; secrets via `userConfig` `sensitive: true`, never
+shipped).
+
+- **Multi-type ingest.** `/slickage-skill:new` gains `--type skill|hook|mcp`
+  (default `skill`). Per-type scaffold: `skill` → `skills/<name>/SKILL.md`;
+  `hook` → `hooks/hooks.json` + `scripts/<name>.sh`; `mcp` → `.mcp.json` with
+  `userConfig` secret declarations. Import mode's required key file is per-type
+  (`SKILL.md` / `hooks.json` / `.mcp.json`).
+- **Catalog sync.** New `/slickage-skill:sync-catalog [--dry-run]` regenerates the
+  README `## Catalog` tables from the three Notion data sources (Skills, MCP,
+  Hooks) between HTML-comment markers, then opens a PR. Manual, not automatic.
+  Classification rule: `Install` contains `@slickage` or `plugins/<name>/` exists
+  → Hosted here; else Endorsed elsewhere. Notion is the human index; the README is
+  the install surface; this command keeps them in sync.
+- **Catalog scope.** The README catalog now mirrors all three Notion tables, not
+  just Skills. Most rows remain external (link-don't-vendor).
+
 ## Future (v2+)
 
 - Measure (telemetry shim, designed above).
