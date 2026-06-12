@@ -46,6 +46,25 @@
         "workflow",
         "automation"
       ]
+    },
+    {
+      "name": "slickage-skill",
+      "source": "./plugins/slickage-skill",
+      "description": "Ingest path for the Slickage skill catalog: scaffold a conformant plugin from a description or an existing local skill folder and open a PR.",
+      "version": "0.1.0",
+      "author": {
+        "name": "slickage"
+      },
+      "repository": "https://github.com/slickage/claude-plugins",
+      "keywords": [
+        "skills",
+        "scaffold",
+        "ingest",
+        "catalog",
+        "plugin-authoring",
+        "gh",
+        "pr"
+      ]
     }
   ]
 }
