@@ -122,6 +122,64 @@ See the [full step-by-step guide](./plugins/issue-lifecycle/README.md) for a det
 
 ---
 
+### slickage-skill (v0.1.0)
+
+The **ingest on-ramp** for this catalog. One command, `/slickage-skill:new`, scaffolds a conformant skill plugin — either from a short description you give, or by importing an existing local skill folder — registers it in `marketplace.json` via `bin/sync-versions.sh`, branches, and opens a PR with `gh`. PR review is the quality gate.
+
+#### Prerequisites
+
+- [GitHub CLI](https://cli.github.com/) installed and authenticated (`gh` command available)
+- Run from a clone of `slickage/claude-plugins`
+
+#### Install
+
+```bash
+/plugin install slickage-skill@slickage
+```
+
+#### Command
+
+| Command | Description |
+|---------|-------------|
+| `/slickage-skill:new <skill-name> [--from <path>]` | Scaffold a new skill plugin and open a PR. Omit `--from` to build from a two-line description; pass `--from <folder>` to import an existing local skill. |
+
+To contribute a skill to the **Hosted here** set in the [Catalog](#catalog) below, run this command — don't hand-edit `marketplace.json`.
+
+---
+
+## Catalog
+
+This repo is Slickage's installable Claude Code skill catalog. The
+human-readable index lives in the Notion AI wiki ([AI] Claude Skills, MCP,
+Hooks); this README is the install surface. The endorsed set splits two ways.
+
+**Hosted here** — after `/plugin marketplace add slickage/claude-plugins`:
+
+| Skill | Install | What it does |
+|-------|---------|--------------|
+| `stackgen` | `/plugin install stackgen@slickage` | Analyzes codebases and generates tailored skills. |
+| `issue-lifecycle` | `/plugin install issue-lifecycle@slickage` | Standardizes issue tracking (Linear/Jira) from intake to PR. |
+| `slickage-skill` | `/plugin install slickage-skill@slickage` | Ingest on-ramp — scaffold a new skill and open a PR. |
+
+**Endorsed elsewhere** — referenced, not re-hosted; install from their own
+source so upstream stays canonical:
+
+| Skill | Install | What it does |
+|-------|---------|--------------|
+| `superpowers` | `/plugin install superpowers@claude-plugins-official` | Core workflow pack: brainstorming, TDD, debugging, plans, worktrees, parallel agents. |
+| `frontend-design` | `/plugin install frontend-design@claude-plugins-official` | Distinctive, production-grade frontend UIs that avoid the generic AI look. |
+| `code-review` | `/plugin install code-review@claude-plugins-official` | Multi-agent code review of a branch or PR. |
+| `commit-commands` | `/plugin install commit-commands@claude-plugins-official` | Git slash commands: `/commit`, `/commit-push-pr`, `/clean_gone`. |
+| `impeccable` | `/plugin marketplace add pbakaus/impeccable` → `/plugin install impeccable@impeccable` | Frontend design suite: `/critique`, `/audit`, `/polish`, `/animate`, and more. |
+| `beads-tasks` (`bd`) | `/plugin marketplace add boka-slickage/beads-claude-plugin` → `/plugin install beads-tasks@beads-claude-plugin` | Persistent, file-based task tracking that survives across sessions. |
+| `caveman` | `/plugin marketplace add JuliusBrussee/caveman` → `/plugin install caveman@caveman` | Ultra-compressed output mode — cuts ~75% of tokens, keeps technical accuracy. |
+| Claude in Chrome | Extension — install from [claude.ai/chrome](https://claude.ai/chrome) (not a `/plugin`) | Drives a Chrome browser from Claude for in-page tasks and debugging. |
+
+Found a skill worth sharing? Add it to the **Hosted here** set with
+`/slickage-skill:new`, or add a row to the Notion catalog for an external one.
+
+---
+
 ## Workflow
 
 **stackgen:**
