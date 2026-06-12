@@ -1,18 +1,22 @@
 # slickage-skill
 
-The ingest + catalog-sync on-ramp for the Slickage skill catalog. Two commands:
+The two halves of the Slickage catalog workflow — **authoring** new entries and
+**consuming** the team's endorsed set.
 
 - **`/slickage-skill:new <name> [--type skill|hook|mcp] [--from <path>]`** — scaffold a
-  conformant plugin (a skill, a hook, or an MCP server), either from a short
-  description or by importing an existing local folder. Registers it in
-  `marketplace.json` via `bin/sync-versions.sh`, branches, and opens a PR with `gh`.
+  conformant plugin (a skill, a hook, or an MCP server) into this repo, either from a
+  short description or by importing a local folder, then sync `marketplace.json` and
+  open a PR.
   - `skill` (default) → `skills/<name>/SKILL.md`
   - `hook` → `hooks/hooks.json` + `scripts/<name>.sh`
   - `mcp` → `.mcp.json` (secrets declared as `userConfig`, never shipped)
-- **`/slickage-skill:sync-catalog [--dry-run]`** — regenerate the README `## Catalog`
-  tables (Skills, MCP, Hooks) from the Notion catalog and open a PR. Refresh after a
-  Notion edit. Requires the Notion MCP connected in the session.
+- **`/slickage-skill:sync [--scope user|project|local] [--dry-run]`** — read the team's
+  Notion catalog (Skills, MCP, Hooks), diff it against what you already have installed
+  (`claude plugin list`), present the missing entries as a checklist, and
+  `claude plugin install` the ones you pick. True manual entries (e.g. `brew`-installed
+  CLI tools, hand-wired `settings.json` hooks) are surfaced as instructions, not
+  auto-installed.
 
-**Prerequisites:** `gh` installed and authenticated; run from a clone of
-`slickage/claude-plugins`. `sync-catalog` additionally needs the Notion MCP. PR
-review is the quality gate.
+**Prerequisites:** `new` needs `gh` authenticated and a clone of
+`slickage/claude-plugins`. `sync` needs the **Notion MCP** connected and the `claude`
+CLI on PATH. PR review is the quality gate for authored entries.

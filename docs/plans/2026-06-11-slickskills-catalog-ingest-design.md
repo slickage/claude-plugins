@@ -150,14 +150,22 @@ shipped).
   `hook` → `hooks/hooks.json` + `scripts/<name>.sh`; `mcp` → `.mcp.json` with
   `userConfig` secret declarations. Import mode's required key file is per-type
   (`SKILL.md` / `hooks.json` / `.mcp.json`).
-- **Catalog sync.** New `/slickage-skill:sync-catalog [--dry-run]` regenerates the
-  README `## Catalog` tables from the three Notion data sources (Skills, MCP,
-  Hooks) between HTML-comment markers, then opens a PR. Manual, not automatic.
-  Classification rule: `Install` contains `@slickage` or `plugins/<name>/` exists
-  → Hosted here; else Endorsed elsewhere. Notion is the human index; the README is
-  the install surface; this command keeps them in sync.
-- **Catalog scope.** The README catalog now mirrors all three Notion tables, not
-  just Skills. Most rows remain external (link-don't-vendor).
+- **Catalog sync = install assistant.** New `/slickage-skill:sync [--scope] [--dry-run]`
+  reads the team's Notion catalog (Skills, MCP, Hooks data sources), diffs it
+  against what the coworker already has installed (`claude plugin list --json`),
+  presents the missing entries as an `AskUserQuestion` checklist, and installs the
+  picks via the `claude` CLI (`claude plugin marketplace add` + `claude plugin
+  install --scope`). True manual entries (brew CLIs, hand-wired `settings.json`
+  hooks) are surfaced as instructions, not auto-run. Notion is the source of
+  truth; this command brings a machine in line with it.
+  - *Rejected approach:* an earlier cut regenerated the README catalog table from
+    Notion and opened a PR. Dropped — keeping a README mirror of Notion has no
+    value; the point is to **install**, not to duplicate the list into docs.
+  - Detection insight: nearly every catalog entry installs as a *plugin* (even the
+    MCP rows), so the diff is `catalog plugin_ids − claude plugin list ids`.
+- **Catalog scope.** The README keeps only the stable **Hosted here** table (our
+  own plugins); the third-party set is browsed in Notion or pulled via `sync`,
+  not mirrored into the README.
 
 ## Future (v2+)
 
