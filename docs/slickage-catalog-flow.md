@@ -5,6 +5,7 @@ from it. The diagram below renders on GitHub and in Notion (paste into a `mermai
 code block).
 
 ```mermaid
+%%{init: {'flowchart': {'subGraphTitleMargin': {'top': 12, 'bottom': 12}, 'nodeSpacing': 55, 'rankSpacing': 55}}}%%
 flowchart TD
     Start([What do you want to do?])
     Start --> Q{Add a tool to the<br/>catalog, or install<br/>tools from it?}
@@ -12,10 +13,14 @@ flowchart TD
     Q -->|"Share / add a tool"| PUB["<b>/slickage-catalog:publish</b>"]
     Q -->|"Set up my machine"| SYNC["<b>/slickage-catalog:sync</b>"]
 
+    %% command nodes sit OUTSIDE the subgraphs so the subgraph titles aren't overlapped
+    PUB --> P1
+    SYNC --> S1
+
     %% ---------- PUBLISH ----------
     subgraph PUBLISH["PUBLISH — add an entry to the catalog"]
         direction TB
-        PUB --> P1{Is the tool yours,<br/>or third-party?}
+        P1{Is the tool yours,<br/>or third-party?}
         P1 -->|"Mine — local,<br/>not published yet"| HOST["HOST path"]
         P1 -->|"Third-party — already<br/>published elsewhere"| ENDORSE["ENDORSE path"]
 
@@ -33,7 +38,7 @@ flowchart TD
     %% ---------- SYNC ----------
     subgraph SYNC_FLOW["SYNC — install endorsed tools onto your machine"]
         direction TB
-        SYNC --> S1["Read the Notion catalog<br/>(Skills, MCP, Hooks)"]
+        S1["Read the Notion catalog<br/>(Skills, MCP, Hooks)"]
         S1 --> S2["Diff against what you<br/>already have installed"]
         S2 --> S3{Anything missing?}
         S3 -->|"No"| INSYNC([You're in sync ✓])
