@@ -122,6 +122,58 @@ See the [full step-by-step guide](./plugins/issue-lifecycle/README.md) for a det
 
 ---
 
+### slickage-catalog (v0.1.0)
+
+Two halves of the catalog workflow — **publish** entries and **sync** them onto your machine. **`/slickage-catalog:publish`** adds an entry to the catalog: if it's **yours** (local/unpublished) it scaffolds a plugin — a **skill**, **hook**, or **MCP** server — into this repo, opens a PR, and adds the Notion row; if it's **third-party** (already published, e.g. `impeccable`, `mattpocock`) it just adds a Notion row endorsing it. **`/slickage-catalog:sync`** reads the team's Notion catalog and installs the endorsed entries you don't have yet via the `claude` CLI.
+
+#### Prerequisites
+
+- `/slickage-catalog:publish` — the **Notion MCP** connected (every entry gets a catalog row). The HOST path additionally needs [GitHub CLI](https://cli.github.com/) authenticated and a clone of `slickage/claude-plugins`.
+- `/slickage-catalog:sync` — the **Notion MCP** connected, and the `claude` CLI on PATH
+
+#### Install
+
+```bash
+/plugin install slickage-catalog@slickage
+```
+
+#### Commands
+
+| Command | Description |
+|---------|-------------|
+| `/slickage-catalog:publish <name> [--type skill\|hook\|mcp] [--from <path>] [--source <upstream>]` | Add an entry to the catalog. Picks its path automatically: `--from <local-folder>` (or a described new one) → **host** it here + PR + Notion row; `--source <upstream-install/URL>` → **endorse** a third-party entry with a Notion row only. Asks which path when neither flag is given. |
+| `/slickage-catalog:sync [--scope user\|project\|local] [--dry-run]` | Diff the Notion catalog against your installed plugins, present the missing ones as a checklist, and `claude plugin install` the ones you pick. `--dry-run` prints the install commands only. |
+
+Add anything to the catalog with `/slickage-catalog:publish` (don't hand-edit `marketplace.json`). Pull endorsed entries onto your machine with `/slickage-catalog:sync`.
+
+---
+
+## Catalog
+
+The team's curated catalog of skills, MCP servers, and hooks lives in the
+**Notion AI wiki** ([AI] Claude Skills, MCP, Hooks) — that's the source of truth.
+Most entries are third-party and installed from their own upstream; a few
+(`stackgen`, `issue-lifecycle`, `slickage-catalog`) are **hosted here**.
+
+**To install endorsed entries onto your machine, run
+[`/slickage-catalog:sync`](#slickage-catalog-v010).** It reads the Notion catalog,
+compares it against what you already have, and lets you pick what to install.
+To add anything to the catalog — host your own or endorse a third-party — run
+`/slickage-catalog:publish`.
+
+**Hosted here** — install directly after `/plugin marketplace add slickage/claude-plugins`:
+
+| Skill | Install | What it does |
+|-------|---------|--------------|
+| `stackgen` | `/plugin install stackgen@slickage` | Analyzes codebases and generates tailored skills. |
+| `issue-lifecycle` | `/plugin install issue-lifecycle@slickage` | Standardizes issue tracking (Linear/Jira) from intake to PR. |
+| `slickage-catalog` | `/plugin install slickage-catalog@slickage` | Ingest + catalog-sync on-ramp for this marketplace. |
+
+Everything else (third-party skills, MCP servers, hooks) is endorsed but lives
+upstream — browse it in Notion or just run `/slickage-catalog:sync`.
+
+---
+
 ## Workflow
 
 **stackgen:**
