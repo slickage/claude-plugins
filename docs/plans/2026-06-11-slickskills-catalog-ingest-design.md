@@ -121,14 +121,21 @@ makes a skill live; consumers pull via `/plugin`.
   confirm `/plugin install <skill>@slickage` works in a fresh session.
 - Lint: `bin/sync-versions.sh` runs clean and produces no diff on a no-op.
 
-## Open questions / risks
+## Open questions / risks — RESOLVED
 
-- **Ingest command depth.** v1 can be as thin as "scaffold + PR" or richer
-  ("interview the author, generate SKILL.md from the conversation"). Recommendation:
-  start thin (scaffold from a short description + existing-folder import), enrich
-  later. To be decided in the implementation plan.
-- **Curation source.** Which skills seed the catalog — pull the
-  endorsed set from the Notion catalog. List finalized during implementation.
+Both resolved in the implementation plan
+(`2026-06-11-slickskills-catalog-ingest-plan.md`):
+
+- **Ingest command depth → thin.** v1 scaffolds from a short description OR
+  imports an existing local skill folder, then opens a PR. No conversational
+  interview / chat-to-SKILL.md generation; enrich in v2.
+- **Curation source → Notion "Skills" endorsed set** (data source
+  `collection://4c032e9f-e7b1-4181-87a7-0ade9d821351`). Endorsed rows: `caveman`,
+  `frontend-design`, `commit-commands`, `impeccable`, `issue-lifecycle`,
+  `code-review`, `beads-tasks (bd)`, `Claude in Chrome`, `superpowers`. **Link,
+  don't vendor:** 8 of 9 point to external sources and are referenced by their
+  native install string; only `issue-lifecycle` is hosted here. Locally hosted
+  set stays `stackgen` + `issue-lifecycle` + the new `slickage-skill` plugin.
 
 ## Future (v2+)
 
