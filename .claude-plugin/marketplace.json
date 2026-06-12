@@ -48,8 +48,8 @@
       ]
     },
     {
-      "name": "slickage-skill",
-      "source": "./plugins/slickage-skill",
+      "name": "slickage-catalog",
+      "source": "./plugins/slickage-catalog",
       "description": "Ingest path for the Slickage skill catalog: scaffold a conformant plugin from a description or an existing local skill folder and open a PR.",
       "version": "0.1.0",
       "author": {

@@ -1,5 +1,14 @@
 # SlickSkills — MVP Implementation Plan (Catalog + Ingest)
 
+> **⚠️ Partially superseded (2026-06-11).** This plan captures the *original* MVP
+> task list (catalog README + a single `/slickage-catalog:new` ingest command).
+> The implementation evolved during the build — see the design doc's
+> **Addendum** for the current shape: the plugin is `slickage-catalog` (renamed
+> from `slickage-skill`), with two commands — **`:publish`** (host your own *or*
+> endorse a third-party entry, both writing a Notion catalog row) and **`:sync`**
+> (install endorsed entries from the Notion catalog). Task references to `:new`
+> below are historical; the command is now `:publish`.
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Design:** `docs/plans/2026-06-11-slickskills-catalog-ingest-design.md`
@@ -7,11 +16,11 @@
 **Status:** Ready to implement
 
 **Goal:** Stand up `slickage/claude-plugins` as the team skill catalog (Part A —
-document + cross-link the endorsed set) and ship a thin `/slickage-skill:new`
+document + cross-link the endorsed set) and ship a thin `/slickage-catalog:new`
 ingest command that scaffolds a conformant plugin and opens a PR (Part B).
 
 **Architecture:** No servers, no telemetry. Catalog = README section + a pointer
-from the Notion AI wiki. Ingest = one new plugin (`plugins/slickage-skill/`) with
+from the Notion AI wiki. Ingest = one new plugin (`plugins/slickage-catalog/`) with
 a single command file that scaffolds, syncs `marketplace.json` via
 `bin/sync-versions.sh`, branches, and opens a PR with `gh`.
 
@@ -36,7 +45,7 @@ a single command file that scaffolds, syncs `marketplace.json` via
   (`claude-plugins-official`, `JuliusBrussee/caveman`, …); only `issue-lifecycle`
   is hosted here. The catalog references external ones by their native install
   string — it does NOT copy them into this repo. Locally hosted plugins stay
-  `stackgen` + `issue-lifecycle` + the new `slickage-skill`.
+  `stackgen` + `issue-lifecycle` + the new `slickage-catalog`.
 
 ---
 
@@ -69,7 +78,7 @@ endorsed set as two groups:
 
 State explicitly: external skills are referenced, not re-hosted, so upstream
 stays the source of truth. Note that contributing a *new* skill to the hosted
-set is done with `/slickage-skill:new` (Task 4).
+set is done with `/slickage-catalog:new` (Task 4).
 
 **Step 2: Run the sync script (no-op check) and commit**
 
@@ -100,12 +109,12 @@ This is the only cross-link needed for discovery (design § Part A). No code.
 
 ---
 
-### Task 3: Scaffold the `slickage-skill` ingest plugin skeleton
+### Task 3: Scaffold the `slickage-catalog` ingest plugin skeleton
 
 **Files:**
-- Create: `plugins/slickage-skill/.claude-plugin/plugin.json`
-- Create: `plugins/slickage-skill/commands/.gitkeep` (placeholder until Task 4)
-- Create: `plugins/slickage-skill/README.md`
+- Create: `plugins/slickage-catalog/.claude-plugin/plugin.json`
+- Create: `plugins/slickage-catalog/commands/.gitkeep` (placeholder until Task 4)
+- Create: `plugins/slickage-catalog/README.md`
 
 **Step 1: Write `plugin.json` (version source of truth)**
 
@@ -113,7 +122,7 @@ Mirror the existing plugins' shape (`plugins/stackgen/.claude-plugin/plugin.json
 
 ```json
 {
-  "name": "slickage-skill",
+  "name": "slickage-catalog",
   "version": "0.1.0",
   "description": "Ingest path for the Slickage skill catalog: scaffold a conformant plugin from a description or an existing local skill folder and open a PR.",
   "author": { "name": "slickage" },
@@ -133,21 +142,21 @@ of `slickage/claude-plugins`).
 **Step 3: Register in the marketplace and commit**
 
 ```bash
-bin/sync-versions.sh          # adds slickage-skill to marketplace.json + README from plugin.json
-git add plugins/slickage-skill .claude-plugin/marketplace.json README.md
-git commit -m "feat(slickage-skill): scaffold ingest plugin skeleton"
+bin/sync-versions.sh          # adds slickage-catalog to marketplace.json + README from plugin.json
+git add plugins/slickage-catalog .claude-plugin/marketplace.json README.md
+git commit -m "feat(slickage-catalog): scaffold ingest plugin skeleton"
 ```
 
 Verify `sync-versions.sh` picked up the new `plugin.json` and added the
-`slickage-skill` entry to `marketplace.json` automatically (never hand-edit it).
+`slickage-catalog` entry to `marketplace.json` automatically (never hand-edit it).
 
 ---
 
-### Task 4: Write the `/slickage-skill:new` command (thin v1)
+### Task 4: Write the `/slickage-catalog:new` command (thin v1)
 
 **Files:**
-- Create: `plugins/slickage-skill/commands/new.md`
-- Delete: `plugins/slickage-skill/commands/.gitkeep`
+- Create: `plugins/slickage-catalog/commands/new.md`
+- Delete: `plugins/slickage-catalog/commands/.gitkeep`
 
 Follow the command-authoring conventions in `README.md` § "Adding a New Slash
 Command" (frontmatter, `## Context` with `!`-backtick injection, numbered
@@ -209,10 +218,10 @@ source of truth — set `0.1.0`; do NOT touch versions in `marketplace.json`.
 bin/sync-versions.sh
 git checkout -b feat/skill-<skill-name>
 git add plugins/<skill-name> .claude-plugin/marketplace.json README.md
-git commit -m "feat(<skill-name>): add skill via /slickage-skill:new"
+git commit -m "feat(<skill-name>): add skill via /slickage-catalog:new"
 git push -u origin feat/skill-<skill-name>
 gh pr create --fill --title "feat(<skill-name>): add skill" \
-  --body "Scaffolded via /slickage-skill:new. Review = quality gate."
+  --body "Scaffolded via /slickage-catalog:new. Review = quality gate."
 ```
 
 If `bin/sync-versions.sh` fails, abort and report — leave the tree clean
@@ -232,9 +241,9 @@ If `bin/sync-versions.sh` fails, abort and report — leave the tree clean
 **Step 7: Commit the command itself**
 
 ```bash
-git add plugins/slickage-skill/commands/new.md
-git rm plugins/slickage-skill/commands/.gitkeep
-git commit -m "feat(slickage-skill): add /slickage-skill:new ingest command"
+git add plugins/slickage-catalog/commands/new.md
+git rm plugins/slickage-catalog/commands/.gitkeep
+git commit -m "feat(slickage-catalog): add /slickage-catalog:new ingest command"
 ```
 
 ---
@@ -242,14 +251,14 @@ git commit -m "feat(slickage-skill): add /slickage-skill:new ingest command"
 ### Task 5: Document the ingest command in the top-level README
 
 **Files:**
-- Modify: `README.md` (`## Available Plugins` → add a `slickage-skill` entry;
-  Catalog section → note "contribute a skill" points at `/slickage-skill:new`)
+- Modify: `README.md` (`## Available Plugins` → add a `slickage-catalog` entry;
+  Catalog section → note "contribute a skill" points at `/slickage-catalog:new`)
 
 **Step 1: Add the plugin entry + contribution pointer, then sync + commit**
 
 ```bash
 bin/sync-versions.sh
-git add README.md && git commit -m "docs(slickage-skill): document ingest command and contribution path"
+git add README.md && git commit -m "docs(slickage-catalog): document ingest command and contribution path"
 ```
 
 ---
@@ -260,13 +269,13 @@ Per design § Testing. Not a code change — a verification checklist run by a h
 
 **Step 1: Describe mode**
 
-Run `/slickage-skill:new test-skill-describe` end to end. Confirm it produces a
+Run `/slickage-catalog:new test-skill-describe` end to end. Confirm it produces a
 valid `plugins/test-skill-describe/` layout, a `marketplace.json` synced by the
 script (not hand-edited), and an open PR. Close the PR / delete the branch after.
 
 **Step 2: Import mode**
 
-Run `/slickage-skill:new test-skill-import --from <some-local-skill-folder>`.
+Run `/slickage-catalog:new test-skill-import --from <some-local-skill-folder>`.
 Confirm the folder is copied into the layout and a PR opens.
 
 **Step 3: Guard checks**

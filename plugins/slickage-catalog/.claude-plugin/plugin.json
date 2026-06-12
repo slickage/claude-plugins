@@ -1,5 +1,5 @@
 {
-  "name": "slickage-skill",
+  "name": "slickage-catalog",
   "version": "0.1.0",
   "description": "Ingest path for the Slickage skill catalog: scaffold a conformant plugin from a description or an existing local skill folder and open a PR.",
   "author": { "name": "slickage" },

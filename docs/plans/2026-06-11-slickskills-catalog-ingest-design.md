@@ -40,7 +40,7 @@ private to the Slickage org).
   the marketplace. Nothing to build.
 
 **Part B — Ingest command (the real net-new build)**
-- A new plugin providing a `/slickage-skill new` slash command.
+- A new plugin providing a `/slickage-catalog new` slash command.
 - Interactive flow: the author describes the skill (or points at an existing local
   skill folder); Claude scaffolds a conformant `SKILL.md` (+ `plugin.json` and the
   `plugins/<name>/` layout), adds the entry to `.claude-plugin/marketplace.json`,
@@ -66,7 +66,7 @@ private to the Slickage org).
 
 ```
 Author (Claude Code)
-  │  /slickage-skill new
+  │  /slickage-catalog new
   ▼
 scaffold SKILL.md + plugin.json + plugins/<name>/        ── Ingest (Part B)
   │  update marketplace.json  +  bin/sync-versions.sh
@@ -116,7 +116,7 @@ makes a skill live; consumers pull via `/plugin`.
 
 ## Testing
 
-- Manual acceptance: run `/slickage-skill new` end to end, confirm it produces a
+- Manual acceptance: run `/slickage-catalog new` end to end, confirm it produces a
   valid plugin folder, a synced `marketplace.json`, and an open PR; after merge,
   confirm `/plugin install <skill>@slickage` works in a fresh session.
 - Lint: `bin/sync-versions.sh` runs clean and produces no diff on a no-op.
@@ -135,7 +135,7 @@ Both resolved in the implementation plan
   `code-review`, `beads-tasks (bd)`, `Claude in Chrome`, `superpowers`. **Link,
   don't vendor:** 8 of 9 point to external sources and are referenced by their
   native install string; only `issue-lifecycle` is hosted here. Locally hosted
-  set stays `stackgen` + `issue-lifecycle` + the new `slickage-skill` plugin.
+  set stays `stackgen` + `issue-lifecycle` + the new `slickage-catalog` plugin.
 
 ## Addendum (2026-06-11) — multi-type ingest + catalog sync
 
@@ -145,12 +145,26 @@ plugin docs that a single plugin can bundle skills, commands, agents, **hooks**
 (`.mcp.json`, local or remote; secrets via `userConfig` `sensitive: true`, never
 shipped).
 
-- **Multi-type ingest.** `/slickage-skill:new` gains `--type skill|hook|mcp`
-  (default `skill`). Per-type scaffold: `skill` → `skills/<name>/SKILL.md`;
-  `hook` → `hooks/hooks.json` + `scripts/<name>.sh`; `mcp` → `.mcp.json` with
-  `userConfig` secret declarations. Import mode's required key file is per-type
-  (`SKILL.md` / `hooks.json` / `.mcp.json`).
-- **Catalog sync = install assistant.** New `/slickage-skill:sync [--scope] [--dry-run]`
+The plugin was also renamed `slickage-skill` → **`slickage-catalog`** (it manages
+skills *and* MCP *and* hooks, so `-skill` was too narrow). Final command set is two:
+`publish` (produce) and `sync` (consume).
+
+- **`/slickage-catalog:publish` — one entry point, two paths.** Replaces the earlier
+  `:new`. Adds an entry to the catalog and picks its path automatically:
+  - **HOST** (the entry is yours / local / unpublished — `--from <folder>` or a
+    described new one): scaffold a conformant plugin into the repo, open a PR, and add
+    a Notion row with `Install = …@slickage`. Multi-type: `skill` →
+    `skills/<name>/SKILL.md`; `hook` → `hooks/hooks.json` + `scripts/<name>.sh`; `mcp`
+    → `.mcp.json` with `userConfig` secret declarations. Import key file per type
+    (`SKILL.md` / `hooks.json` / `.mcp.json`).
+  - **ENDORSE** (the entry is third-party / already published — `--source <upstream>`):
+    no hosting, just a Notion row pointing at the upstream install string. Requires an
+    install string; a local-only entry routes back to HOST.
+  - **Both paths end by writing a Notion row** in the type's data source (Skills / MCP
+    / Hooks) via `notion-create-pages`. That row is what makes the entry discoverable
+    by `sync`. This unifies "add my skill" and "endorse a third-party skill" into one
+    command, so there's no "which command do I run?" confusion.
+- **Catalog sync = install assistant.** `/slickage-catalog:sync [--scope] [--dry-run]`
   reads the team's Notion catalog (Skills, MCP, Hooks data sources), diffs it
   against what the coworker already has installed (`claude plugin list --json`),
   presents the missing entries as an `AskUserQuestion` checklist, and installs the
