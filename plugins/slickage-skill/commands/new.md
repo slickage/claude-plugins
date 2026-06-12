@@ -67,7 +67,17 @@ plugins/<skill-name>/README.md
 - `skills/<skill-name>/SKILL.md` — the content from Step 3.
 - `README.md` — a one-paragraph summary of the skill.
 
-`plugin.json` is the version source of truth — set it to `0.1.0`. NEVER hand-edit versions in `marketplace.json`.
+Then add a section for the skill to the **root** `README.md` so `bin/sync-versions.sh` can track its version (it warns otherwise). Under `## Available Plugins`, before that section's trailing `---`, insert:
+
+```markdown
+### <skill-name> (v0.1.0)
+
+<one-line description>. Install: `/plugin install <skill-name>@slickage`.
+
+---
+```
+
+`plugin.json` is the version source of truth — set it to `0.1.0`. NEVER hand-edit versions in `marketplace.json`; let `bin/sync-versions.sh` derive them.
 
 ### Step 5: Sync, branch, commit, push, PR
 
