@@ -1,4 +1,4 @@
-# CONTEXT — Issue Lifecycle
+# GLOSSARY — Issue Lifecycle
 
 Glossary for the issue-tracking standardization work. Terms only — no implementation detail.
 
